@@ -7,10 +7,10 @@
 Assign a variable:
 `KEYWORD:set IDENTIFIER = <expr>`
 
-Reassign a variable
+Reassign a variable:
 `IDENTIFIER = <expr>`
 
 ### Statements
 
-If statement
+If statement:
 `KEYWORD:if <expr> (-> <expr>|{ <statements> })`
