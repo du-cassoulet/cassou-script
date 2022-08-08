@@ -5,12 +5,12 @@
 ### Variables
 
 Assign a variable:
-**COMPOSITION:** `KEYWORD:set IDENTIFIER = <expr>`
+`KEYWORD:set IDENTIFIER = <expr>`
 
 Reassign a variable
-**COMPOSITION:** `IDENTIFIER = <expr>`
+`IDENTIFIER = <expr>`
 
 ### Statements
 
 If statement
-**COMPOSITION:** `KEYWORD:if <expr> (-> <expr>|{ <statements> })`
+`KEYWORD:if <expr> (-> <expr>|{ <statements> })`
