@@ -1,1 +1,1 @@
-# cassou-script
+# Cassouscript (csc)
