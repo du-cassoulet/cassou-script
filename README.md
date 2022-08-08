@@ -3,6 +3,14 @@
 ## Documentation
 
 ### Variables
-**COMPOSITION:** `KEYWORD:set IDENTIFIER`
+
+Assign a variable:
+**COMPOSITION:** `KEYWORD:set IDENTIFIER = <expr>`
+
+Reassign a variable
+**COMPOSITION:** `IDENTIFIER = <expr>`
 
 ### Statements
+
+If statement
+**COMPOSITION:** `KEYWORD:if <expr> (-> <expr>|{ <statements> })`
