@@ -1,5 +1,7 @@
 import PromptSync from "prompt-sync";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { getattr } from "../../utils.js";
 import Errors from "../Errors.js";
 import RTResult from "../RTResult.js";
@@ -7,8 +9,9 @@ import BaseFunction from "./BaseFunction.js";
 import Number from "./Number.js";
 import String from "./String.js";
 import List from "./List.js";
-import { run } from "../../index.js";
+import { run } from "../../index.js"
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const prompt = PromptSync({ sigint: true });
 
 class BuiltInFunction extends BaseFunction {
@@ -144,10 +147,11 @@ class BuiltInFunction extends BaseFunction {
       ));
     }
 
-    fn = fn.value;
+    const rootDir = execCtx.parentEntryPos.fn.split("/").slice(0, -1).join("/");
+    fn = path.join(__dirname, "../../", rootDir, fn.value);
     try {
       const script = fs.readFileSync(fn, "utf-8");
-      let [_, error] = run(fn, script.replace(/\r/g, ""));
+      let [_, error] = run(fn, script);
 
       if (error) {
         return new RTResult().failure(new Errors.RTError(

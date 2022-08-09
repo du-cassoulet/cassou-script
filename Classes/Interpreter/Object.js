@@ -1,18 +1,9 @@
-import String from "./String.js";
 import Value from "./Value.js";
 
 class Object extends Value {
   constructor(elements) {
     super();
     this.elements = elements;
-  }
-
-  getIn(other) {
-    if (other instanceof String) {
-      return [this.elements.find((e => e.elements[0] === other.value)).elements[1], null];
-    } else {
-      return [null, this.illegalOperation(this.addedTo, other)];
-    }
   }
 
   copy() {

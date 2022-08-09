@@ -120,16 +120,33 @@ class Parser {
     } else if (tok.type === Flags.TT_IDENTIFIER) {
       res.registerAdvancement()
       this.advance();
+      let path = [];
+
+      while (this.currentTok.type === Flags.TT_DOT) {
+        res.registerAdvancement();
+        this.advance();
+
+        if (this.currentTok.type !== Flags.TT_STRING) {
+          res.failure(new Errors.ExpectedCharError(
+            this.currentTok.posStart, this.currentTok.posEnd,
+            "Expected a string"
+          ));
+        }
+
+        path.push(this.currentTok.value);
+        res.registerAdvancement();
+        this.advance();
+      }
 
       if (this.currentTok.type === Flags.TT_EQ) {
         res.registerAdvancement();
         this.advance();
         let expr = res.register(this.expr());
         if (res.error) return res;
-        return res.success(new VarReAssignNode(tok, expr));
-      };
+        return res.success(new VarReAssignNode(tok, path, expr));
+      }
 
-      return res.success(new VarAccessNode(tok));
+      return res.success(new VarAccessNode(tok, path));
     } else if (tok.type === Flags.TT_LPAREN) {
       res.registerAdvancement()
       this.advance();
@@ -141,7 +158,7 @@ class Parser {
         this.advance();
         return res.success(expr);
       } else {
-        return res.failure(new Errors.InvalidSyntaxError(
+        return res.failure(new Errors.ExpectedCharError(
           this.currentTok.posStart, this.currentTok.posEnd,
           "Expected ')'"
         ));

@@ -1,9 +1,10 @@
 class VarAccessNode {
-  constructor(varNameTok) {
+  constructor(varNameTok, varPathTok) {
     this.varNameTok = varNameTok;
+    this.varPathTok = varPathTok;
 
     this.posStart = this.varNameTok.posStart;
-    this.posEnd = this.varNameTok.posEnd;
+    this.posEnd = this.varPathTok.posEnd;
   }
 }
 

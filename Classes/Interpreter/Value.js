@@ -85,10 +85,6 @@ class Value {
     return [null, this.illegalOperation(other)];
   }
 
-  getIn(other) {
-    return [null, this.illegalOperation(other)];
-  }
-
   copy() {
     throw new Error("No copy method defined");
   }

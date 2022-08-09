@@ -2,6 +2,7 @@ import Context from "../Context.js";
 import RTResult from "../RTResult.js";
 import SymbolTable from "../SymbolTable.js";
 import Value from "./Value.js";
+import Errors from "../Errors.js";
 
 class BaseFunction extends Value {
   constructor(name) {

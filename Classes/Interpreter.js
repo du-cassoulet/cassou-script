@@ -61,6 +61,17 @@ class Interpreter {
     );
   }
 
+  visit_EntryNode(node, context) {
+    let res = new RTResult();
+    let keyName = node.keyTok.value;
+    let value = res.register(this.visit(node.valueNode, context));
+    if (res.shouldReturn()) return res;
+
+    return res.success(
+      new List([keyName, value]).setContext(context).setPos(node.posStart, node.posEnd)
+    );
+  }
+
   visit_VarAccessNode(node, context) {
     let res = new RTResult();
     let varName = node.varNameTok.value;
@@ -77,6 +88,10 @@ class Interpreter {
       ));
     }
 
+    for (const keyTok of node.varPathTok) {
+      value = value.elements.find((x) => x.elements[0] === keyTok).elements[1];
+    }
+
     value = value.copy().setPos(node.posStart, node.posEnd).setContext(context);
     return res.success(value);
   }
@@ -91,27 +106,51 @@ class Interpreter {
     return res.success(value);
   }
 
-  visit_EntryNode(node, context) {
-    let res = new RTResult();
-    let keyName = node.keyTok.value;
-    let value = res.register(this.visit(node.valueNode, context));
-    if (res.shouldReturn()) return res;
-
-    return res.success(
-      new List([keyName, value]).setContext(context).setPos(node.posStart, node.posEnd)
-    );
-  }
-
   visit_VarReAssignNode(node, context) {
     let res = new RTResult();
     let varName = node.varNameTok.value;
     let value = res.register(this.visit(node.newValueNode, context));
     if (res.error) return res;
-    if (context.symbolTable.get(varName)) {
-      context.symbolTable.set(varName, value);
-    } else if (context.symbolTable.parent.get(varName)) {
-      context.symbolTable.parent.set(varName, value);
+
+    function setValue(symbolTable) {
+      let newNode = symbolTable.get(varName);
+
+      for (let i in node.varPathTok) {
+        i = parseInt(i);
+        let e = node.varPathTok[i];
+        let ei = newNode.elements.findIndex((x) => x.elements[0] === e);
+
+        if (ei + 1 === 0) {
+          if (i + 1 === node.varPathTok.length) {
+            newNode.elements.push(
+              new List([e, value])
+                .setContext(context)
+                .setPos(node.posStart, node.posEnd)
+            )
+          } else {
+            return res.failure(new Errors.RTError(
+              node.posStart, node.posEnd,
+              "Invalid assignment"
+            ));
+          }
+        } else {
+          if (i + 1 === node.varPathTok.length) {
+            newNode.elements[ei].elements[1] = value;
+          } else {
+            newNode = newNode.elements[ei].elements[1];
+          }
+        }
+      }
+      
+      symbolTable.set(varName, symbolTable.get(varName)); 
     }
+
+    if (context.symbolTable.get(varName)) {
+      setValue(context.symbolTable);
+    } else if (context.symbolTable.parent.get(varName)) {
+      setValue(context.symbolTable.parent);
+    }
+
     return res.success(value);
   }
 
@@ -152,8 +191,6 @@ class Interpreter {
       [result, error] = left.oredBy(right);
     } else if (node.opTok.type === Flags.TT_AND) {
       [result, error] = left.andedBy(right);
-    } else if (node.opTok.type === Flags.TT_DOT) {
-      [result, error] = left.getIn(right);
     } else if (node.opTok.matches(Flags.TT_KEYWORD, "in")) {
       [result, error] = left.isIn(right);
     }

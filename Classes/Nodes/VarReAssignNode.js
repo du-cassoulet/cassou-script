@@ -1,6 +1,7 @@
 class VarReAssignNode {
-  constructor(varNameTok, newValueNode) {
+  constructor(varNameTok, varPathTok, newValueNode) {
     this.varNameTok = varNameTok;
+    this.varPathTok = varPathTok;
     this.newValueNode = newValueNode;
 
     this.posStart = this.varNameTok.posStart;

@@ -230,7 +230,7 @@ class Lexer {
     } else if (this.currentChar === ">") {
       this.advance();
 
-      while (this.currentChar !== "\n") {
+      while (this.currentChar !== "\n" && this.currentChar !== null) {
         this.advance();
       }
 
