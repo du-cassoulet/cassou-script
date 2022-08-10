@@ -4,8 +4,9 @@
 
 **Create a list**
 
-```html
-<h1>Cassoulet</h1>
+```js
+// Build an Array
+const cassoulet = [ "banana", "pineapple" ]
 ```
 
 <pre class="notranslate" style="position: relative;">
