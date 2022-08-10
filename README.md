@@ -10,7 +10,7 @@ const cassoulet = [ "banana", "pineapple" ]
 ```
 
 <pre><code>
-<span class="pl-k">set</span>
+<span class="keyword">set</span>
 </code></pre>
 
 <pre><code>
