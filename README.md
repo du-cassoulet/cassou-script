@@ -5,5 +5,5 @@
 **Create a list**
 
 <pre class="notranslate" style="position: relative;">
-<code style="background:red">Cassoulet</code>
+<code style="color:red!important">Cassoulet</code>
 </pre>
