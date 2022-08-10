@@ -5,7 +5,5 @@
 **Create a list**
 
 <pre class="notranslate" style="position: relative;">
-<div style="color:red">
- Cassoulet
-</div>
+<code style="color:red">Cassoulet</code>
 </pre>
