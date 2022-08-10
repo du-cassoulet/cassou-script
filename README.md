@@ -4,4 +4,8 @@
 
 **Create a list**
 
-<div>Cassoulet</div>
+`
+<div style="color:red">
+ Cassoulet
+</div>
+`
