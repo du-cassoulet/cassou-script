@@ -72,3 +72,17 @@ log(fruits); >> [ 'banana', 'pineapple', 'apple' ]
 fruits -= 0;
 log(fruits); >> [ 'pineapple', 'apple' ]
 ```
+
+## Object
+
+#### Create an object
+> This example shows the way to create an object using *object literal notation*.
+```
+>> 'car' object created using object literal notation.
+set car = {
+    "color": "red",
+    "price": 25000
+}
+log(car);
+>> { color: 'red', price: 25000 }
+```
