@@ -1,5 +1,3 @@
 # Cassouscript (csc)
  
-`
-CASSOULET
-`
+> Cassoulet
