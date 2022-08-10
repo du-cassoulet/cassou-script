@@ -3,7 +3,7 @@
 ## List
 
 #### Create a List
-> This example shows the way to create list using <u>list literal notation</u>.
+> This example shows the way to create list using *list literal notation*.
 ```
 >> 'fruits' list created using list literal notation.
 set fruits = ["banana", "pineapple"];
