@@ -9,13 +9,9 @@ class List extends Value {
   }
 
   addedTo(other) {
-    if (other instanceof Number) {
-      let newList = this.copy();
-      newList.elements.push(other);
-      return [newList, null];
-    } else {
-      return [null, this.illegalOperation(this, other)];
-    }
+    let newList = this.copy();
+    newList.elements.push(other);
+    return [newList, null];
   }
 
   subbedBy(other) {
@@ -51,23 +47,6 @@ class List extends Value {
         newList.elements = [...newList.elements, ...currentList.elements];
       }
       return [newList, null];
-    } else {
-      return [null, this.illegalOperation(this, other)];
-    }
-  }
-
-  divedBy(other) {
-    if (other instanceof Number) {
-      let newList = this.copy();
-      try {
-        return [newList.elements[other.value], null];
-      } catch {
-        return [null, new Errors.RTError(
-          other.posStart, other.posEnd,
-          "Element at this index could not be retrived from list because index is out of bounds",
-          this.context
-        )]
-      }
     } else {
       return [null, this.illegalOperation(this, other)];
     }

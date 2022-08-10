@@ -11,6 +11,8 @@ export default [
   "return",
   "continue",
   "break",
-  "typeof",
-  "in"
+  "type",
+  "in",
+  "true",
+  "false"
 ]

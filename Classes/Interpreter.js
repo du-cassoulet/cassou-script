@@ -7,6 +7,7 @@ import Function from "./Interpreter/Function.js";
 import String from "./Interpreter/String.js";
 import List from "./Interpreter/List.js";
 import Object from "./Interpreter/Object.js";
+import Boolean from "./Interpreter/Boolean.js";
 
 class Interpreter {
   constructor() {}
@@ -19,6 +20,15 @@ class Interpreter {
 
   noVisitMethod(node) {
     throw new Error(`No visit_${node.constructor.name} method defined`);
+  }
+
+  visit_BooleanNode(node, context) {
+    let bool = false;
+    if (node.tok.value === "true") bool = true;
+
+    return new RTResult().success(
+      new Boolean(bool).setContext(context).setPos(node.posStart, node.posEnd)
+    );
   }
 
   visit_NumberNode(node, context) {
@@ -76,9 +86,6 @@ class Interpreter {
     let res = new RTResult();
     let varName = node.varNameTok.value;
     let value = context.symbolTable.get(varName);
-    if(!value && context.symbolTable.parent) {
-      value = context.symbolTable.parent.get(varName);
-    }
 
     if (!value) {
       return res.failure(new Errors.RTError(
@@ -88,8 +95,30 @@ class Interpreter {
       ));
     }
 
-    for (const keyTok of node.varPathTok) {
-      value = value.elements.find((x) => x.elements[0] === keyTok).elements[1];
+    if (value instanceof Object) {
+      for (let keyTok of node.varPathTok) {
+        if (keyTok.type === Flags.TT_IDENTIFIER) {
+          keyTok = context.symbolTable.get(keyTok.value);
+        }
+
+        value = value.elements.find((x) => x.elements[0] === keyTok.value).elements[1];
+      }
+    } else if (value instanceof List) {
+      for (let keyTok of node.varPathTok) {
+        if (keyTok.type === Flags.TT_IDENTIFIER) {
+          keyTok = context.symbolTable.get(keyTok.value);
+        }
+
+        value = value.elements[keyTok.value];
+      }
+    }
+
+    if (!value) {
+      return res.failure(new Errors.RTError(
+        node.posStart, node.posEnd,
+        `'${varName}' is not defined`,
+        context
+      ));
     }
 
     value = value.copy().setPos(node.posStart, node.posEnd).setContext(context);
@@ -106,6 +135,36 @@ class Interpreter {
     return res.success(value);
   }
 
+  visit_VarOperateNode(node, context) {
+    let res = new RTResult();
+    let varName = node.varNameTok.value;
+    let symbolTable = context.symbolTable;
+    let varValue = symbolTable.get(varName);
+
+    let value = res.register(this.visit(node.newValueNode, context));
+    if (res.shouldReturn()) return res;
+
+    let result, error;
+
+    if (node.operatorTok.type === Flags.TT_PLE) {
+      [result, error] = varValue.addedTo(value)
+    } else if (node.operatorTok.type === Flags.TT_MIE) {
+      [result, error] = varValue.subbedBy(value)
+    } else if (node.operatorTok.type === Flags.TT_MUE) {
+      [result, error] = varValue.multedBy(value)
+    } else if (node.operatorTok.type === Flags.TT_DIE) {
+      [result, error] = varValue.divedBy(value)
+    }
+
+    symbolTable.set(varName, result);
+
+    if (error) {
+      return res.failure(error);
+    } else {
+      return res.success(result.setPos(node.posStart, node.posEnd));
+    }
+  }
+
   visit_VarReAssignNode(node, context) {
     let res = new RTResult();
     let varName = node.varNameTok.value;
@@ -115,29 +174,65 @@ class Interpreter {
     function setValue(symbolTable) {
       let newNode = symbolTable.get(varName);
 
-      for (let i in node.varPathTok) {
-        i = parseInt(i);
-        let e = node.varPathTok[i];
-        let ei = newNode.elements.findIndex((x) => x.elements[0] === e);
-
-        if (ei + 1 === 0) {
-          if (i + 1 === node.varPathTok.length) {
-            newNode.elements.push(
-              new List([e, value])
-                .setContext(context)
-                .setPos(node.posStart, node.posEnd)
-            )
-          } else {
-            return res.failure(new Errors.RTError(
-              node.posStart, node.posEnd,
-              "Invalid assignment"
-            ));
+      if (newNode instanceof Object) {
+        for (let i in node.varPathTok) {
+          i = parseInt(i);
+          let e = node.varPathTok[i];
+          if (e.type === Flags.TT_IDENTIFIER) {
+            e = symbolTable.get(e.value);
           }
-        } else {
-          if (i + 1 === node.varPathTok.length) {
-            newNode.elements[ei].elements[1] = value;
+          let ei = newNode.elements.findIndex((x) => x.elements[0] === e);
+  
+          if (ei + 1 === 0) {
+            if (i + 1 === node.varPathTok.length) {
+              newNode.elements.push(
+                new List([e, value])
+                  .setContext(context)
+                  .setPos(node.posStart, node.posEnd)
+              )
+            } else {
+              return res.failure(new Errors.RTError(
+                node.posStart, node.posEnd,
+                "Invalid assignment"
+              ));
+            }
           } else {
-            newNode = newNode.elements[ei].elements[1];
+            if (i + 1 === node.varPathTok.length) {
+              newNode.elements[ei].elements[1] = value;
+            } else {
+              newNode = newNode.elements[ei].elements[1];
+            }
+          }
+        }
+      } else if (newNode instanceof List) {
+        for (let i in node.varPathTok) {
+          i = parseInt(i);
+          let e = node.varPathTok[i];
+          if (e.type === Flags.TT_IDENTIFIER) {
+            e = symbolTable.get(e.value);
+          }
+  
+          if (e + 1 === 0) {
+            if (i + 1 === node.varPathTok.length) {
+              newNode.elements.push(value)
+            } else {
+              return res.failure(new Errors.RTError(
+                node.posStart, node.posEnd,
+                "Invalid assignment"
+              ));
+            }
+          } else {
+            if (i + 1 === node.varPathTok.length) {
+              newNode.elements[e] = value;
+            } else {
+              if (!newNode.elements[e]) {
+                return res.failure(new Errors.IllegalCharError(
+                  node.posStart, node.posEnd,
+                  `Invalid index '${e}' in list`
+                ));
+              }
+              newNode = newNode.elements[e];
+            }
           }
         }
       }
@@ -147,10 +242,9 @@ class Interpreter {
 
     if (context.symbolTable.get(varName)) {
       setValue(context.symbolTable);
-    } else if (context.symbolTable.parent.get(varName)) {
-      setValue(context.symbolTable.parent);
     }
 
+    if (res.error) return res;
     return res.success(value);
   }
 
@@ -264,7 +358,6 @@ class Interpreter {
     }
 
     let i = startValue.value;
-
     if (stepValue.value >= 0) {
       var condition = () => i < endValue.value;
     } else {

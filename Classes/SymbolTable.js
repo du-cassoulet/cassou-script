@@ -6,7 +6,7 @@ class SymbolTable {
 
   get(name) {
     let value = this.symbols[name];
-    if (value === null && this.parent) {
+    if (!value && this.parent) {
       return this.parent.get(name);
     }
     return value;

@@ -9,8 +9,6 @@ import BuiltInFunction from "./Classes/Interpreter/BuiltInFunction.js";
 
 const globalSymbolTable = new SymbolTable();
 globalSymbolTable.set("null", Number.null);
-globalSymbolTable.set("true", Number.true);
-globalSymbolTable.set("false", Number.false);
 globalSymbolTable.set("pi", Number.pi);
 globalSymbolTable.set("log", BuiltInFunction.log);
 globalSymbolTable.set("ask", BuiltInFunction.ask);
@@ -21,6 +19,10 @@ globalSymbolTable.set("round", BuiltInFunction.round);
 globalSymbolTable.set("floor", BuiltInFunction.floor);
 globalSymbolTable.set("ceil", BuiltInFunction.ceil);
 globalSymbolTable.set("join", BuiltInFunction.join);
+globalSymbolTable.set("size", BuiltInFunction.size);
+globalSymbolTable.set("integer", BuiltInFunction.integer);
+globalSymbolTable.set("float", BuiltInFunction.float);
+globalSymbolTable.set("string", BuiltInFunction.string);
 
 export function run(fn, text) {
   let lexer = new Lexer(fn, text);

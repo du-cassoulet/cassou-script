@@ -1,6 +1,7 @@
 import Number from "./Number.js";
 import Value from "./Value.js";
 import List from "./List.js";
+import Boolean from "./Boolean.js";
 
 class String extends Value {
   constructor(value) {
@@ -26,7 +27,15 @@ class String extends Value {
 
   getComparisonEq(other) {
     if (other instanceof String) {
-      return [new Number(+(this.value === other.value)).setContext(this.context), null];
+      return [new Boolean(this.value === other.value).setContext(this.context), null];
+    } else {
+      return [null, this.illegalOperation(this.addedTo, other)];
+    }
+  }
+
+  getComparisonNe(other) {
+    if (other instanceof String) {
+      return [new Boolean(this.value !== other.value).setContext(this.context), null];
     } else {
       return [null, this.illegalOperation(this.addedTo, other)];
     }

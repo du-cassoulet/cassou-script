@@ -24,27 +24,24 @@ class Lexer {
     let tokens = []
 
     while (this.currentChar !== null) {
-      if (" \t".includes(this.currentChar)) {
+      if (" \t\r".includes(this.currentChar)) {
         this.advance();
-      } else if (";\r\n".includes(this.currentChar)) {
+      } else if (";\n".includes(this.currentChar)) {
         tokens.push(new Token(Flags.TT_NEWLINE, null, this.pos));
         this.advance();
       } else if (this.currentChar === ">") {
         let token = this.makeGreaterThanOrComment();
         if (token) tokens.push(token);
       } else if (Chars.DIGITS.includes(this.currentChar)) {
-        tokens.push(this.makeNumber());
+        tokens.push(this.makeNumber(tokens));
       } else if (Chars.LETTERS.includes(this.currentChar)) {
         tokens.push(this.makeIdentifier());
       } else if (this.currentChar === "+") {
-        tokens.push(new Token(Flags.TT_PLUS, null, this.pos));
-        this.advance();
+        tokens.push(this.makePlus());
       } else if (this.currentChar === "*") {
-        tokens.push(new Token(Flags.TT_MUL, null, this.pos));
-        this.advance();
+        tokens.push(this.makeMultiply());
       } else if (this.currentChar === "/") {
-        tokens.push(new Token(Flags.TT_DIV, null, this.pos));
-        this.advance();
+        tokens.push(this.makeDivide());
       } else if (this.currentChar === "%") {
         tokens.push(new Token(Flags.TT_MODULO, null, this.pos));
         this.advance();
@@ -106,22 +103,35 @@ class Lexer {
     return [tokens, null];
   }
 
-  makeNumber() {
+  makeNumber(tokens) {
+    let lastTok = tokens[tokens.length - 1];
     let numStr = "";
     let dotCount = 0;
     let posStart = this.pos.copy();
-
-    while (this.currentChar !== null && `${Chars.DIGITS}.`.includes(this.currentChar)) {
-      if (this.currentChar === ".") {
-        if (dotCount === 1) break;
-
-        ++dotCount;
-        numStr += ".";
-      } else {
+    if (lastTok.type === Flags.TT_DOT) {
+      while (
+        this.currentChar !== null &&
+        Chars.DIGITS.includes(this.currentChar)
+      ) {
         numStr += this.currentChar;
+        this.advance();
       }
-      
-      this.advance();
+    } else {
+      while (
+        this.currentChar !== null &&
+        `${Chars.DIGITS}.`.includes(this.currentChar)
+      ) {
+        if (this.currentChar === ".") {
+          if (dotCount === 1) break;
+  
+          ++dotCount;
+          numStr += ".";
+        } else {
+          numStr += this.currentChar;
+        }
+        
+        this.advance();
+      }
     }
 
     if (dotCount === 0) {
@@ -147,16 +157,12 @@ class Lexer {
       this.currentChar !== null &&
       (this.currentChar !== stringChar || escapeCharacter)
     ) {
-      if (escapeCharacter) {
+      if (this.currentChar === "\\") {
+        escapeCharacter = true;
+        this.advance();
         string += escapeCharacters[this.currentChar];
       } else {
-        if (this.currentChar === "\\") {
-          escapeCharacter = true;
-          this.advance();
-          string += this.currentChar;
-        } else {
-          string += this.currentChar;
-        }
+        string += this.currentChar;
       }
 
       this.advance();
@@ -178,6 +184,45 @@ class Lexer {
 
     let tokType = Keywords.includes(idStr) ? Flags.TT_KEYWORD: Flags.TT_IDENTIFIER;
     return new Token(tokType, idStr, posStart, this.pos);
+  }
+
+  makePlus() {
+    let tokType = Flags.TT_PLUS;
+    let posStart = this.pos.copy();
+    this.advance();
+
+    if (this.currentChar === "=") {
+      this.advance();
+      tokType = Flags.TT_PLE;
+    }
+
+    return new Token(tokType, null, posStart, this.pos);
+  }
+
+  makeMultiply() {
+    let tokType = Flags.TT_MUL;
+    let posStart = this.pos.copy();
+    this.advance();
+
+    if (this.currentChar === "=") {
+      this.advance();
+      tokType = Flags.TT_MUE;
+    }
+
+    return new Token(tokType, null, posStart, this.pos);
+  }
+
+  makeDivide() {
+    let tokType = Flags.TT_DIV;
+    let posStart = this.pos.copy();
+    this.advance();
+
+    if (this.currentChar === "=") {
+      this.advance();
+      tokType = Flags.TT_DIE;
+    }
+
+    return new Token(tokType, null, posStart, this.pos);
   }
 
   makeNotEquals() {
@@ -249,6 +294,9 @@ class Lexer {
     if (this.currentChar === ">") {
       this.advance();
       tokType = Flags.TT_ARROW;
+    } else if (this.currentChar === "=") {
+      this.advance();
+      tokType = Flags.TT_MIE;
     }
 
     return new Token(tokType, null, posStart, this.pos);

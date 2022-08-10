@@ -24,6 +24,10 @@ class BuiltInFunction extends BaseFunction {
   static floor = new BuiltInFunction("floor");
   static ceil = new BuiltInFunction("ceil");
   static join = new BuiltInFunction("join");
+  static size = new BuiltInFunction("size");
+  static integer = new BuiltInFunction("integer");
+  static float = new BuiltInFunction("float");
+  static string = new BuiltInFunction("string");
 
   constructor(name) {
     super(name);
@@ -36,6 +40,10 @@ class BuiltInFunction extends BaseFunction {
     this.args_floor = ["value"];
     this.args_ceil = ["value"];
     this.args_join = ["join", "array"];
+    this.args_size = ["array"];
+    this.args_integer = ["val"];
+    this.args_float = ["val"];
+    this.args_string = ["val"];
   }
 
   execute(args) {
@@ -193,6 +201,46 @@ class BuiltInFunction extends BaseFunction {
 
     return new RTResult().success(
       new String(array.elements.map((e) => e.toString()).join(join.value))
+    );
+  }
+
+  execute_size(execCtx) {
+    let array = execCtx.symbolTable.get("array");
+    return new RTResult().success(
+      new Number(array.elements.length)
+    );
+  }
+
+  execute_integer(execCtx) {
+    let res = new RTResult();
+    let val = execCtx.symbolTable.get("val");
+
+    if (isNaN(parseInt(val.value))) {
+      return res.success(Number.null);
+    }
+
+    return res.success(
+      new Number(parseInt(val.value))
+    );
+  }
+
+  execute_float(execCtx) {
+    let res = new RTResult();
+    let val = execCtx.symbolTable.get("val");
+
+    if (isNaN(parseFloat(val.value))) {
+      return res.success(Number.null);
+    }
+
+    return res.success(
+      new Number(parseFloat(val.value))
+    );
+  }
+
+  exeute_string(execCtx) {
+    let val = execCtx.symbolTable.get("val");
+    return res.success(
+      new String(val.value.toString())
     );
   }
 }

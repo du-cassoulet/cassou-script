@@ -20,6 +20,8 @@ import TypeNode from "./Nodes/typeNode.js";
 import VarReAssignNode from "./Nodes/VarReAssignNode.js";
 import ObjectNode from "./Nodes/ObjectNode.js";
 import EntryNode from "./Nodes/EntryNode.js";
+import BooleanNode from "./Nodes/BooleanNode.js";
+import VarOperateNode from "./Nodes/VarOperateNode.js";
 
 class Parser {
   constructor(tokens) {
@@ -117,6 +119,13 @@ class Parser {
       res.registerAdvancement();
       this.advance();
       return res.success(new StringNode(tok));
+    } else if (
+      tok.matches(Flags.TT_KEYWORD, "true") ||
+      tok.matches(Flags.TT_KEYWORD, "false")
+    ) {
+      res.registerAdvancement();
+      this.advance();
+      return res.success(new BooleanNode(tok));
     } else if (tok.type === Flags.TT_IDENTIFIER) {
       res.registerAdvancement()
       this.advance();
@@ -126,16 +135,22 @@ class Parser {
         res.registerAdvancement();
         this.advance();
 
-        if (this.currentTok.type !== Flags.TT_STRING) {
+        if (
+          [
+            Flags.TT_STRING,
+            Flags.TT_INT,
+            Flags.TT_IDENTIFIER
+          ].includes(this.currentTok.type)
+        ) {
+          path.push(this.currentTok);
+          res.registerAdvancement();
+          this.advance();
+        } else {
           res.failure(new Errors.ExpectedCharError(
             this.currentTok.posStart, this.currentTok.posEnd,
-            "Expected a string"
+            "Expected a string or an int"
           ));
         }
-
-        path.push(this.currentTok.value);
-        res.registerAdvancement();
-        this.advance();
       }
 
       if (this.currentTok.type === Flags.TT_EQ) {
@@ -144,6 +159,17 @@ class Parser {
         let expr = res.register(this.expr());
         if (res.error) return res;
         return res.success(new VarReAssignNode(tok, path, expr));
+      } else if (
+        [Flags.TT_PLE, Flags.TT_MIE, Flags.TT_MUE, Flags.TT_DIE]
+          .includes(this.currentTok.type)
+      ) {
+        let operatorTok = this.currentTok;
+        res.registerAdvancement();
+        this.advance();
+
+        let expr = res.register(this.expr());
+        if (res.error) return res;
+        return res.success(new VarOperateNode(tok, operatorTok, expr));
       }
 
       return res.success(new VarAccessNode(tok, path));
@@ -331,6 +357,11 @@ class Parser {
     res.registerAdvancement();
     this.advance();
 
+    while (this.currentTok.type === Flags.TT_NEWLINE) {
+      res.registerAdvancement();
+      this.advance();
+    }
+
     if (this.currentTok.type === Flags.TT_RSQUARE) {
       res.registerAdvancement();
       this.advance();
@@ -347,8 +378,18 @@ class Parser {
         res.registerAdvancement();
         this.advance();
 
+        while (this.currentTok.type === Flags.TT_NEWLINE) {
+          res.registerAdvancement();
+          this.advance();
+        }
+
         elementNodes.push(res.register(this.expr()));
         if (res.error) return res;
+      }
+
+      while (this.currentTok.type === Flags.TT_NEWLINE) {
+        res.registerAdvancement();
+        this.advance();
       }
 
       if (this.currentTok.type !== Flags.TT_RSQUARE) {
@@ -896,16 +937,6 @@ class Parser {
       return res.success(new ReturnNode(expr, posStart, this.currentTok.posStart.copy()));
     }
 
-    if (this.currentTok.matches(Flags.TT_KEYWORD, "typeof")) {
-      res.registerAdvancement();
-      this.advance();
-
-      let expr = res.tryRegister(this.expr());
-      if (!expr) this.reverse(res.toReverseCount);
-
-      return res.success(new TypeNode(expr, posStart, this.currentTok.posStart.copy()));
-    }
-
     if (this.currentTok.matches(Flags.TT_KEYWORD, "continue")) {
       res.registerAdvancement();
       this.advance();
@@ -962,9 +993,29 @@ class Parser {
       return res.success(new VarAssignNode(varName, expr, false));
     }
 
-    let node = res.register(this.binOp("compExpr", [Flags.TT_AND, Flags.TT_OR, Flags.TT_DOT, [Flags.TT_KEYWORD, "in"]]));
+    if (this.currentTok.matches(Flags.TT_KEYWORD, "type")) {
+      res.registerAdvancement();
+      this.advance();
+
+      let expr = res.tryRegister(this.expr());
+      if (!expr) res.failure(new Errors.InvalidSyntaxError(
+        this.currentTok.posStart, this.currentTok.posEnd,
+        "Expected int, float, identifier, string, object, list"
+      ));
+
+      return res.success(
+        new TypeNode(expr, this.currentTok.posStart, this.currentTok.posStart.copy())
+      );
+    }
+
+    let node = res.register(this.binOp("compExpr", [
+      Flags.TT_AND,
+      Flags.TT_OR,
+      [Flags.TT_KEYWORD, "in"]
+    ]));
     if (res.error) {
       return res.failure(new Errors.InvalidSyntaxError(
+        this.currentTok.posStart, this.currentTok.posEnd,
         "Expected 'set', int, float, identifier, '+', '-' or '('"
       ));
     };
