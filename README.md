@@ -1,3 +1,5 @@
 # Cassouscript (csc)
  
- ```CACA```
+`
+CASSOULET
+`
