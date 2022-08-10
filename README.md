@@ -9,8 +9,11 @@
 const cassoulet = [ "banana", "pineapple" ]
 ```
 
-<div class="highlight highlight-source-js notranslate position-relative overflow-auto">
-<pre class="notranslate" style="position: relative;">
-<span class="pl-k">set</span>
-</pre>
-</div>
+<pre><code>
+<span class="code-keyword">set</span>
+</code></pre>
+
+<pre><code>
+<span class="code-comment"># Ignore the fact this is Perl, and pretend it's some unheard-of language</span>
+<span class="code-keyword">our</span> <span class="code-variable">$site</span> = <span class="code-string">"needs this"</span>;
+</code></pre>
