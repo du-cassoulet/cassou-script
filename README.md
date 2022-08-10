@@ -3,6 +3,7 @@
 ## List
 
 #### Create a List
+> This example shows the way to create list using list __literal notation__.
 ```
 >> 'fruits' list created using list literal notation.
 set fruits = ["banana", "pineapple"];
