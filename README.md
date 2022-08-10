@@ -9,6 +9,8 @@
 const cassoulet = [ "banana", "pineapple" ]
 ```
 
-<pre class="notranslate" style="position: relative;">
-<span class="pl-k">set</span>
-</pre>
+<div class="highlight highlight-source-js notranslate position-relative overflow-auto">
+  <pre class="notranslate" style="position: relative;">
+    <span class="pl-k">set</span>
+  </pre>
+ </div>
