@@ -10,5 +10,5 @@ const cassoulet = [ "banana", "pineapple" ]
 ```
 
 <pre class="notranslate" style="position: relative;">
-<code style="color:red!important">Cassoulet</code>
+<span class="pl-k">set</span>
 </pre>
