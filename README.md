@@ -44,3 +44,31 @@ set fruits = ["banana", "pineapple"];
 log("banana" in fruits) >> true
 log("apple" in fruits) >> false
 ```
+
+#### Add an item to a List
+> This exemple shows the way to add an item to a list using the *'+' operator*.
+```
+set fruits = ["banana", "pineapple"];
+
+>> To add an item to a list for this statement.
+log(fruits + "apple"); >> [ 'banana', 'pineapple', 'apple' ]
+log(fruits); >> [ 'banana', 'pineapple' ]
+
+>> To add an item to a list forever.
+fruits += "apple";
+log(fruits); >> [ 'banana', 'pineapple', 'apple' ]
+```
+
+#### Remove an item to from a List
+> This exemple shows the way to remove an item from a list using the *'-' operator*.
+```
+set fruits = ["banana", "pineapple", "apple"];
+
+>> To remove an item to from list for this statement.
+log(fruits - 1); >> [ 'banana', 'apple' ]
+log(fruits); >> [ 'banana', 'pineapple', 'apple' ]
+
+>> To remove an item from a list forever.
+fruits -= 0;
+log(fruits); >> [ 'pineapple', 'apple' ]
+```
