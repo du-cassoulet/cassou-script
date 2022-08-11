@@ -1,7 +1,7 @@
 import Interpreter from "../Interpreter.js";
 import RTResult from "../RTResult.js";
 import BaseFunction from "./BaseFunction.js";
-import Number from "./Number.js";
+import Void from "./Void.js";
 
 class Function extends BaseFunction {
   constructor(name, bodyNode, argNames, shouldAutoReturn) {
@@ -22,7 +22,7 @@ class Function extends BaseFunction {
     let value = res.register(interpreter.visit(this.bodyNode, execCtx));
     if (res.shouldReturn() && res.funcReturnValue === null) return res;
 
-    let retValue = (this.shouldAutoReturn ? value: null) || res.funcReturnValue || Number.null;
+    let retValue = (this.shouldAutoReturn ? value: null) || res.funcReturnValue || new Void(null);
     return res.success(retValue);
   }
 

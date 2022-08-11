@@ -8,7 +8,6 @@ import Number from "./Classes/Interpreter/Number.js";
 import BuiltInFunction from "./Classes/Interpreter/BuiltInFunction.js";
 
 const globalSymbolTable = new SymbolTable();
-globalSymbolTable.set("null", Number.null);
 globalSymbolTable.set("pi", Number.pi);
 globalSymbolTable.set("log", BuiltInFunction.log);
 globalSymbolTable.set("ask", BuiltInFunction.ask);

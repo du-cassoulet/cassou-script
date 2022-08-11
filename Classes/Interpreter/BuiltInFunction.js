@@ -9,6 +9,7 @@ import BaseFunction from "./BaseFunction.js";
 import Number from "./Number.js";
 import String from "./String.js";
 import List from "./List.js";
+import Void from "./Void.js";
 import { run } from "../../index.js"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -79,7 +80,7 @@ class BuiltInFunction extends BaseFunction {
 
   execute_log(execCtx) {
     console.log(execCtx.symbolTable.get("value").toString());
-    return new RTResult().success(Number.null);
+    return new RTResult().success(new Void(null));
   }
 
   execute_ask(execCtx) {
@@ -98,7 +99,7 @@ class BuiltInFunction extends BaseFunction {
 
   execute_clear() {
     console.clear();
-    return new RTResult().success(Number.null);
+    return new RTResult().success(new Void(null));
   }
 
   execute_random() {
@@ -176,7 +177,7 @@ class BuiltInFunction extends BaseFunction {
       ));
     }
 
-    return new RTResult().success(Number.null);
+    return new RTResult().success(new Void(null));
   }
 
   execute_join(execCtx) {
@@ -216,7 +217,7 @@ class BuiltInFunction extends BaseFunction {
     let val = execCtx.symbolTable.get("val");
 
     if (isNaN(parseInt(val.value))) {
-      return res.success(Number.null);
+      return res.success(new Void(NaN));
     }
 
     return res.success(
@@ -229,7 +230,7 @@ class BuiltInFunction extends BaseFunction {
     let val = execCtx.symbolTable.get("val");
 
     if (isNaN(parseFloat(val.value))) {
-      return res.success(Number.null);
+      return res.success(new Void(NaN));
     }
 
     return res.success(

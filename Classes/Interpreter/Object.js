@@ -7,7 +7,7 @@ class Object extends Value {
   }
 
   copy() {
-    let copy = new Object({ ...this.elements });
+    let copy = new Object([ ...this.elements ]);
     copy.setPos(this.posStart, this.posEnd);
     copy.setContext(this.context);
     return copy;

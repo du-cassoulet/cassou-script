@@ -47,16 +47,16 @@ class String extends Value {
         this.constructor.name === e.constructor.name &&
         this.value === e.value
       )
-      return [new Number(+includes), null];
+      return [new Boolean(includes), null];
     } else if (other instanceof String) {
-      return [new Number(+(other.value.includes(this.value))), null];
+      return [new Boolean(other.value.includes(this.value)), null];
     } else {
       return [null, this.illegalOperation(this.posStart, this.posEnd)]
     }
   }
 
   isTrue() {
-    return length(this.value) > 0;
+    return this.value.length > 0;
   }
 
   copy() {

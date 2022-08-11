@@ -4,9 +4,6 @@ import List from "./List.js";
 import Boolean from "./Boolean.js";
 
 class Number extends Value {
-  static null = new Number(0);
-  static true = new Number(1);
-  static false = new Number(0);
   static pi = new Number(Math.PI);
 
   constructor(value) {

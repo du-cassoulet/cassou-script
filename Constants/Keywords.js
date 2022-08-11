@@ -14,5 +14,10 @@ export default [
   "type",
   "in",
   "true",
-  "false"
+  "false",
+  "null",
+  "NaN",
+  "switch",
+  "case",
+  "default"
 ]

@@ -8,6 +8,7 @@ import String from "./Interpreter/String.js";
 import List from "./Interpreter/List.js";
 import Object from "./Interpreter/Object.js";
 import Boolean from "./Interpreter/Boolean.js";
+import Void from "./Interpreter/Void.js";
 
 class Interpreter {
   constructor() {}
@@ -21,6 +22,15 @@ class Interpreter {
   noVisitMethod(node) {
     throw new Error(`No visit_${node.constructor.name} method defined`);
   }
+
+  visit_VoidNode(node, context) {
+    let value = null;
+    if (node.tok.value === "NaN") value = NaN;
+
+    return new RTResult().success(
+      new Void(value).setContext(context).setPos(node.posStart, node.posEnd)
+    );
+  } 
 
   visit_BooleanNode(node, context) {
     let bool = false;
@@ -181,6 +191,7 @@ class Interpreter {
           if (e.type === Flags.TT_IDENTIFIER) {
             e = symbolTable.get(e.value);
           }
+          e = e.value;
           let ei = newNode.elements.findIndex((x) => x.elements[0] === e);
   
           if (ei + 1 === 0) {
@@ -316,6 +327,36 @@ class Interpreter {
     }
   }
 
+  visit_SwitchNode(node, context) {
+    let res = new RTResult();
+
+    let condTok = res.register(this.visit(node.switchTok, context));
+    for (const [condition, expr, shouldReturnNull] of node.cases) {
+      let otherTok = res.register(this.visit(condition, context));
+      if (res.shouldReturn()) return res;
+
+      let [conditionValue, error] = condTok.getComparisonEq(otherTok);
+      if (error) {
+        return res.failure(error);
+      }
+
+      if (conditionValue.isTrue()) {
+        let exprValue = res.register(this.visit(expr, context));
+        if (res.shouldReturn()) return res;
+        return res.success(shouldReturnNull ? new Void(null): exprValue);
+      }
+    }
+
+    if (node.defaultNode) {
+      let [expr, shouldReturnNull] = node.defaultNode;
+      let elseValue = res.register(this.visit(expr, context));
+      if (res.shouldReturn()) return res;
+      return res.success(shouldReturnNull ? new Void(null): elseValue);
+    }
+
+    return res.success(new Void(null));
+  }
+ 
   visit_IfNode(node, context) {
     let res = new RTResult();
 
@@ -326,7 +367,7 @@ class Interpreter {
       if (conditionValue.isTrue()) {
         let exprValue = res.register(this.visit(expr, context));
         if (res.shouldReturn()) return res;
-        return res.success(shouldReturnNull ? Number.null: exprValue);
+        return res.success(shouldReturnNull ? new Void(null): exprValue);
       }
     }
 
@@ -334,10 +375,10 @@ class Interpreter {
       let [expr, shouldReturnNull] = node.elseCase;
       let elseValue = res.register(this.visit(expr, context));
       if (res.shouldReturn()) return res;
-      return res.success(shouldReturnNull ? Number.null: elseValue);
+      return res.success(shouldReturnNull ? new Void(null): elseValue);
     }
 
-    return res.success(Number.null);
+    return res.success(new Void(null));
   }
 
   visit_ForNode(node, context) {
@@ -378,7 +419,7 @@ class Interpreter {
     }
     
     return res.success(
-      node.shouldReturnNull ? Number.null:
+      node.shouldReturnNull ? new Void(null):
       new List(elements).setContext(context).setPos(node.posStart, node.posEnd)
     );
   }
@@ -403,7 +444,7 @@ class Interpreter {
     }
 
     return res.success(
-      node.shouldReturnNull ? Number.null:
+      node.shouldReturnNull ? new Void(null):
       new List(elements).setContext(context).setPos(node.posStart, node.posEnd)
     );
   }
@@ -451,7 +492,7 @@ class Interpreter {
       var value = res.register(this.visit(node.nodeToReturn, context));
       if (res.shouldReturn()) return res;
     } else {
-      var value = Number.null;
+      var value = new Void(null);
     }
 
     return res.successReturn(value);
