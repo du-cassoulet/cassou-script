@@ -12,6 +12,8 @@ class String extends Value {
   addedTo(other) {
     if (other instanceof String) {
       return [new String(this.value + other.value).setContext(this.context), null];
+    } else if (other instanceof Number) {
+      return [new String(this.value + other.value.toString()).setContext(this.context), null];
     } else {
       return [null, this.illegalOperation(this.addedTo, other)];
     }
@@ -67,7 +69,7 @@ class String extends Value {
   }
 
   toString() {
-    return this.value.toString();
+    return `'${this.value}'`.green;
   }
 }
 

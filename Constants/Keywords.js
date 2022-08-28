@@ -1,5 +1,6 @@
 export default [
   "set",
+  "func",
   "if",
   "elif",
   "else",
@@ -7,7 +8,6 @@ export default [
   "to",
   "inc",
   "while",
-  "func",
   "return",
   "continue",
   "break",

@@ -1,9 +1,19 @@
 class TypeNode {
-  constructor(nodeElement, posStart, posEnd) {
+  constructor(nodeElement, typeTok) {
     this.nodeElement = nodeElement;
+    this.typeTok = typeTok;
 
-    this.posStart = posStart;
-    this.posEnd = posEnd;
+    if (this.nodeElement) {
+      this.posStart = this.nodeElement.posStart;
+      this.posEnd = this.nodeElement.posEnd;
+    } else {
+      this.posStart = this.typeTok.posStart;
+      this.posEnd = this.typeTok.posEnd;
+    }
+  }
+
+  toString() {
+    return `${this.nodeElement}`;
   }
 }
 

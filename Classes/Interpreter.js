@@ -9,6 +9,7 @@ import List from "./Interpreter/List.js";
 import Object from "./Interpreter/Object.js";
 import Boolean from "./Interpreter/Boolean.js";
 import Void from "./Interpreter/Void.js";
+import Type from "./Interpreter/Type.js";
 
 class Interpreter {
   constructor() {}
@@ -105,21 +106,18 @@ class Interpreter {
       ));
     }
 
-    if (value instanceof Object) {
-      for (let keyTok of node.varPathTok) {
-        if (keyTok.type === Flags.TT_IDENTIFIER) {
-          keyTok = context.symbolTable.get(keyTok.value);
-        }
-
-        value = value.elements.find((x) => x.elements[0] === keyTok.value).elements[1];
+    for (let i in node.varPathTok) {
+      i = parseInt(i);
+      let e = node.varPathTok[i];
+      if (e.type === Flags.TT_IDENTIFIER) {
+        e = symbolTable.get(e.value);
       }
-    } else if (value instanceof List) {
-      for (let keyTok of node.varPathTok) {
-        if (keyTok.type === Flags.TT_IDENTIFIER) {
-          keyTok = context.symbolTable.get(keyTok.value);
-        }
+      e = e.value;
 
-        value = value.elements[keyTok.value];
+      if (value instanceof Object) {
+        value = value.elements.find((x) => x.elements[0] === e).elements[1];
+      } else if (value instanceof List) {
+        value = value.elements[e];
       }
     }
 
@@ -131,7 +129,7 @@ class Interpreter {
       ));
     }
 
-    value = value.copy().setPos(node.posStart, node.posEnd).setContext(context);
+    value = value.copy().setContext(context).setPos(node.posStart, node.posEnd);
     return res.success(value);
   }
 
@@ -450,9 +448,7 @@ class Interpreter {
   }
 
   visit_FuncDefNode(node, context) {
-    let res = new RTResult();
-
-    let funcName = node.varNameTok ? node.varNameTok.value: null;
+    let funcName = node.varNameTok?.value || null;
     let bodyNode = node.bodyNode;
     let argNames = node.argNameToks.map((argName) => argName.value);
     let funcValue = new Function(funcName, bodyNode, argNames, node.shouldAutoReturn)
@@ -463,12 +459,12 @@ class Interpreter {
       context.symbolTable.set(funcName, funcValue);
     }
 
-    return res.success(funcValue);
+    return new RTResult().success(funcValue);
   }
 
   visit_CallNode(node, context) {
     let res = new RTResult();
-    let args = []
+    let args = [];
 
     let valueToCall = res.register(this.visit(node.nodeToCall, context));
     if (res.shouldReturn()) return res;
@@ -509,23 +505,25 @@ class Interpreter {
   visit_TypeNode(node, context) {
     let res = new RTResult();
 
-    if (!node.nodeElement) {
+    if (node.nodeElement !== null) {
+      let value = res.register(this.visit(node.nodeElement, context));
+    
+      if (!value) {
+        return res.failure(new Errors.IllegalCharError(
+          node.posStart, node.posEnd,
+          `Cannot read '${node.nodeElement.varNameTok.value}' of null`
+        ));
+      }
+  
+      return res.success(new Type(value.constructor.name));
+    } else if (node.typeTok !== null) {
+      return res.success(new Type(node.typeTok.value));
+    } else {
       return res.failure(new Errors.InvalidSyntaxError(
         node.posStart, node.posEnd,
         "Invalid element"
       ));
     }
-
-    let value = res.register(this.visit(node.nodeElement, context));
-    
-    if (!value) {
-      return res.failure(new Errors.IllegalCharError(
-        node.posStart, node.posEnd,
-        `Cannot read '${node.nodeElement.varNameTok.value}' of null`
-      ));
-    }
-
-    return res.success(new String(value.constructor.name));
   }
 }
 

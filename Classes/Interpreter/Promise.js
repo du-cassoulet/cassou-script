@@ -1,25 +1,22 @@
 import Value from "./Value.js";
 
-class Void extends Value {
-  constructor(value) {
+class Promise extends Value {
+  constructor(value, id) {
     super();
     this.value = value;
+    this.id = id;
   }
 
   copy() {
-    let copy = new Void(this.value);
+    let copy = new Promise(this.value, this.id);
     copy.setPos(this.posStart, this.posEnd);
     copy.setContext(this.context);
     return copy;
   }
 
-  isTrue() {
-    return false;
-  }
-
   toString() {
-    return `${this.value}`.red;
+    return `Promise ${"<pending>".cyan}`;
   }
 }
 
-export default Void;
+export default Promise;

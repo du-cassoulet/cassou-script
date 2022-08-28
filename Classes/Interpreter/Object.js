@@ -1,3 +1,4 @@
+import List from "./List.js";
 import Value from "./Value.js";
 
 class Object extends Value {
@@ -13,14 +14,12 @@ class Object extends Value {
     return copy;
   }
 
-  toString() {
-    if (this.elements.length === 0) return "{}";
-    let obj = {}
-    this.elements.forEach((e) => {
-      obj[e.elements[0]] = e.elements[1].toString();
-    });
-
-    return obj;
+  toString(tabNum = 0) {
+    let tab = "";
+    for (let i = 0; i < tabNum; i++) tab += " ";
+    return "{".gray + "\n" + this.elements.map((e) => {
+      return "  " + tab + e.elements[0].toString() + ": ".gray + e.elements[1].toString(tabNum + 2);
+    }).join(",\n") + "\n" + tab + "}".gray;
   }
 }
 

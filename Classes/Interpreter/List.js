@@ -59,8 +59,12 @@ class List extends Value {
     return copy;
   }
 
-  toString() {
-    return this.elements.map((e) => e.toString());
+  toString(tabNum = 0) {
+    let tab = "";
+    for (let i = 0; i < tabNum; i++) tab += " ";
+    return "[".gray + "\n" + this.elements.map((e) => {
+      return "  " + tab + e.toString(tabNum + 2);
+    }).join(",\n") + "\n" + tab + "]".gray;
   }
 }
 

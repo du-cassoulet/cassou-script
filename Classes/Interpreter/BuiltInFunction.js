@@ -1,6 +1,7 @@
 import PromptSync from "prompt-sync";
 import fs from "fs";
-import path from "path";
+import path, { resolve } from "path";
+import axios from "axios";
 import { fileURLToPath } from "url";
 import { getattr } from "../../utils.js";
 import Errors from "../Errors.js";
@@ -11,6 +12,11 @@ import String from "./String.js";
 import List from "./List.js";
 import Void from "./Void.js";
 import { run } from "../../index.js"
+import Converter from "../Converter.js";
+import PromiseClass from "./Promise.js";
+import Function from "./Function.js";
+import Value from "./Value.js";
+import Modules from "../Modules.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const prompt = PromptSync({ sigint: true });
@@ -19,7 +25,7 @@ class BuiltInFunction extends BaseFunction {
   static log = new BuiltInFunction("log");
   static ask = new BuiltInFunction("ask");
   static clear = new BuiltInFunction("clear");
-  static run = new BuiltInFunction("run");
+  static import = new BuiltInFunction("import");
   static random = new BuiltInFunction("random");
   static round = new BuiltInFunction("round");
   static floor = new BuiltInFunction("floor");
@@ -29,13 +35,16 @@ class BuiltInFunction extends BaseFunction {
   static integer = new BuiltInFunction("integer");
   static float = new BuiltInFunction("float");
   static string = new BuiltInFunction("string");
+  static fetch = new BuiltInFunction("fetch");
+  static waitfor = new BuiltInFunction("waitfor");
+  static timeout = new BuiltInFunction("timeout");
 
   constructor(name) {
     super(name);
     this.args_log = ["value"];
     this.args_ask = ["value"];
     this.args_clear = [];
-    this.args_run = ["fn"];
+    this.args_import = ["fn"];
     this.args_random = [];
     this.args_round = ["value"];
     this.args_floor = ["value"];
@@ -45,6 +54,9 @@ class BuiltInFunction extends BaseFunction {
     this.args_integer = ["val"];
     this.args_float = ["val"];
     this.args_string = ["val"];
+    this.args_fetch = ["request"];
+    this.args_waitfor = ["promises", "callback"];
+    this.args_timeout = ["ms"];
   }
 
   execute(args) {
@@ -75,7 +87,7 @@ class BuiltInFunction extends BaseFunction {
   }
 
   toString() {
-    return `<built-in function ${this.name}>`;
+    return `<built-in function ${this.name}>`.cyan;
   }
 
   execute_log(execCtx) {
@@ -92,7 +104,7 @@ class BuiltInFunction extends BaseFunction {
     } else {
       return new RTResult().failure(new Errors.TypingError(
         value.posStart, value.posEnd,
-        "Ask value should be a string"
+        "Ask value must be a string"
       ));
     };
   }
@@ -114,7 +126,7 @@ class BuiltInFunction extends BaseFunction {
     } else {
       return new RTResult().failure(new Errors.TypingError(
         value.posStart, value.posEnd,
-        "Ask value should be a number"
+        "Ask value must be a number"
       ));
     };
   }
@@ -127,7 +139,7 @@ class BuiltInFunction extends BaseFunction {
     } else {
       return new RTResult().failure(new Errors.TypingError(
         value.posStart, value.posEnd,
-        "Ask value should be a number"
+        "Ask value must be a number"
       ));
     };
   }
@@ -140,12 +152,12 @@ class BuiltInFunction extends BaseFunction {
     } else {
       return new RTResult().failure(new Errors.TypingError(
         value.posStart, value.posEnd,
-        "Ask value should be a number"
+        "Ask value must be a number"
       ));
     };
   }
 
-  execute_run(execCtx) {
+  execute_import(execCtx) {
     let fn = execCtx.symbolTable.get("fn");
 
     if (!(fn instanceof String)) {
@@ -156,28 +168,45 @@ class BuiltInFunction extends BaseFunction {
       ));
     }
 
-    const rootDir = execCtx.parentEntryPos.fn.split("/").slice(0, -1).join("/");
-    fn = path.join(__dirname, "../../", rootDir, fn.value);
-    try {
-      const script = fs.readFileSync(fn, "utf-8");
-      let [_, error] = run(fn, script);
+    if (fn.value.startsWith("@")) {
+      const moduleName = fn.value.slice(1);
+      const modules = new Modules();
+      const module = new modules[moduleName];
 
-      if (error) {
+      const result = module.run();
+      return new RTResult().success(result);
+    } else {
+      const rootDir = execCtx.parentEntryPos.fn.split("/").slice(0, -1).join("/");
+      let file = path.join(__dirname, "../../", rootDir, fn.value);
+      if (!fs.existsSync(file)) file = path.join(__dirname, "../../", rootDir, fn.value + ".csc");
+      
+      try {
+        const script = fs.readFileSync(file, "utf-8");
+        if (file.endsWith(".json")) {
+          let data = JSON.parse(script);
+          let converter = new Converter();
+          return new RTResult().success(converter.JSONToNodes(data));
+        } else {
+          let [result, error] = run(file, script);
+
+          if (error) {
+            return new RTResult().failure(new Errors.RTError(
+              this.posStart, this.posEnd,
+              `Failed to load script "${file}"\n${error.asString()}`,
+              execCtx
+            ));
+          }
+
+          return new RTResult().success(result);
+        }
+      } catch(e) {
         return new RTResult().failure(new Errors.RTError(
           this.posStart, this.posEnd,
-          `Failed to load script "${fn}"\n${error.asString()}`,
+          `Failed to load script "${file}"\n${e}`,
           execCtx
         ));
       }
-    } catch(e) {
-      return new RTResult().failure(new Errors.RTError(
-        this.posStart, this.posEnd,
-        `Failed to load script "${fn}"\n${e}`,
-        execCtx
-      ));
     }
-
-    return new RTResult().success(new Void(null));
   }
 
   execute_join(execCtx) {
@@ -240,9 +269,117 @@ class BuiltInFunction extends BaseFunction {
 
   exeute_string(execCtx) {
     let val = execCtx.symbolTable.get("val");
-    return res.success(
+    return new RTResult().success(
       new String(val.value.toString())
     );
+  }
+
+  execute_fetch(execCtx) {
+    let res = new RTResult();
+    let converter = new Converter();
+    let request = execCtx.symbolTable.get("request");
+    
+    let url = request.elements.find((e) => e.elements[0] === "url")?.elements?.[1];
+    let method = request.elements.find((e) => e.elements[0] === "method")?.elements?.[1];
+    let data = converter.nodeToValue(request.elements.find((e) => e.elements[0] === "data")?.elements?.[1]);
+    let headers = converter.nodeToValue(request.elements.find((e) => e.elements[0] === "headers")?.elements?.[1]);
+
+    if (!url) {
+      return res.failure(new Errors.RTError(
+        this.posStart, this.posEnd,
+        "'url' argument is required",
+        execCtx
+      ));
+    }
+
+    return res.success(
+      new PromiseClass(axios({
+        url: url?.value,
+        method: method?.value || "GET",
+        data: data,
+        headers: headers
+      }))
+    );
+  }
+
+  execute_waitfor(execCtx) {
+    let res = new RTResult();
+    let promises = execCtx.symbolTable.get("promises");
+    let callback = execCtx.symbolTable.get("callback");
+
+    let converter = new Converter();
+
+    if (!(callback instanceof Function)) {
+      return res.failure(new Errors.RTError(
+        this.posStart, this.posEnd,
+        "This value must be a function",
+        execCtx
+      ));
+    }
+
+    if (promises instanceof PromiseClass) {
+      let resolveValue = new Promise((resolve) => {
+        function useCallback(response) {
+          if (response.constructor.prototype instanceof Value) {
+            var responseData = response;
+          } else {
+            var responseData = converter.valueToNode(response);
+          }
+    
+          let returnValue = callback.execute([responseData]);
+          resolve(returnValue.value);
+        }
+    
+        promises.value.then(useCallback);
+      });
+
+      return res.success(new PromiseClass(resolveValue));
+    } else if (promises instanceof List) {
+      let resolveValue = new Promise(async (resolve) => {
+        let responses = [];
+        function addCallback(response) {
+          if (response.constructor.prototype instanceof Value) {
+            var responseData = response;
+          } else {
+            var responseData = converter.valueToNode(response);
+          }
+
+          responses.push(responseData);
+          if (responses.length === promises.elements.length) {
+            let returnValue = callback.execute([new List(responses)]);
+            resolve(returnValue.value);
+          }
+        }
+
+        for (const promise of promises.elements) {
+          await promise.value.then(addCallback);
+        }
+      });
+
+      return res.success(new PromiseClass(resolveValue));
+    } else {
+      return res.failure(new Errors.RTError(
+        this.posStart, this.posEnd,
+        "This value must be a List or a Promise",
+        execCtx
+      ));
+    }
+  }
+
+  execute_timeout(execCtx) {
+    let res = new RTResult();
+    let ms = execCtx.symbolTable.get("ms");
+
+    if (!(ms instanceof Number)) {
+      return res.failure(new Errors.RTError(
+        this.posStart, this.posEnd,
+        "This value must be a number",
+        execCtx
+      ));
+    }
+
+    let promise = new Promise((resolve) => setTimeout(resolve, ms));
+    return res.success(new PromiseClass(promise));
   }
 }
 

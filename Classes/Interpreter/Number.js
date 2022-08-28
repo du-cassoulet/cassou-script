@@ -120,7 +120,7 @@ class Number extends Value {
 
   oredBy(other) {
     if (other instanceof Number) {
-      return [new Boolean(this.value || other.value).setContext(this.context), null];
+      return [new Number(this.value || other.value).setContext(this.context), null];
     } else {
       return [null, this.illegalOperation(this.posStart, this.posEnd)]
     }
@@ -154,7 +154,7 @@ class Number extends Value {
   }
 
   toString() {
-    return this.value;
+    return this.value.toString().yellow;
   }
 }
 

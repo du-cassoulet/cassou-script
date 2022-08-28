@@ -34,7 +34,7 @@ class Function extends BaseFunction {
   }
 
   toString() {
-    return `<function ${this.name}>`;
+    return `<function ${this.name}>`.cyan;
   }
 }
 

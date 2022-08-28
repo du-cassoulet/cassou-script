@@ -86,7 +86,7 @@ class Boolean extends Value {
   }
 
   toString() {
-    return this.value;
+    return this.value.toString().yellow;
   }
 }
 
