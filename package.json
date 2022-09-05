@@ -1,16 +1,18 @@
 {
-  "name": "nodejs",
+  "name": "cassouscript",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "cassouscript.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./load.js ./scripts/index.csc",
+    "shell": "node ./shell"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^18.0.6",
-    "node-fetch": "^3.2.6"
+    "colors": "^1.4.0",
+    "prompt-sync": "^4.2.0"
   }
 }
