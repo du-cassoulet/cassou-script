@@ -382,9 +382,9 @@ class Interpreter {
 		return res.success(new Void(null));
 	}
 
-	visit_ForNode(node, context) {
+	visit_ForInNode(node, context) {
 		let res = new RTResult();
-		let elements = []
+		let elements = [];
 
 		let startValue = res.register(this.visit(node.startValueNode, context));
 		if (res.shouldReturn()) return res;
@@ -409,6 +409,30 @@ class Interpreter {
 		while (condition()) {
 			context.symbolTable.set(node.varNameTok.value, new Number(i));
 			i += stepValue.value;
+
+			let value = res.register(this.visit(node.bodyNode, context));
+			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak) return res;
+
+			if (res.loopShouldContinue) continue;
+			if (res.loopShouldBreak) break;
+
+			elements.push(value);
+		}
+
+		return res.success(
+			node.shouldReturnNull ? new Void(null) :
+				new List(elements).setContext(context).setPos(node.posStart, node.posEnd)
+		);
+	}
+
+	visit_ForOfNode(node, context) {
+		let res = new RTResult();
+		let elements = [];
+		
+		let browseElements = res.register(this.visit(node.listNode, context));
+
+		for (const browseElement of browseElements.elements) {
+			context.symbolTable.set(node.varNameTok.value, browseElement);
 
 			let value = res.register(this.visit(node.bodyNode, context));
 			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak) return res;

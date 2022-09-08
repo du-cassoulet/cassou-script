@@ -7,7 +7,7 @@ import VarAccessNode from "./Nodes/VarAccessNode.js";
 import VarAssignNode from "./Nodes/VarAssignNode.js";
 import IfNode from "./Nodes/IfNode.js";
 import Errors from "./Errors.js";
-import ForNode from "./Nodes/ForNode.js";
+import ForInNode from "./Nodes/ForInNode.js";
 import WhileNode from "./Nodes/WhileNode.js";
 import FuncDefNode from "./Nodes/FuncDefNode.js";
 import CallNode from "./Nodes/CallNode.js";
@@ -24,6 +24,7 @@ import BooleanNode from "./Nodes/BooleanNode.js";
 import VarOperateNode from "./Nodes/VarOperateNode.js";
 import VoidNode from "./Nodes/VoidNode.js";
 import SwitchNode from "./Nodes/SwitchNode.js";
+import ForOfNode from "./Nodes/ForOfNode.js";
 
 class Parser {
 	constructor(tokens) {
@@ -747,71 +748,120 @@ class Parser {
 		res.registerAdvancement();
 		this.advance();
 
-		let startValue = res.register(this.expr());
-		if (res.error) return res;
-
-		if (!this.currentTok.matches(Flags.TT_KEYWORD, "to")) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'to'"
-			));
-		}
-
-		res.registerAdvancement();
-		this.advance();
-
-		let endValue = res.register(this.expr());
-		if (res.error) return res;
-
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "inc")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, "each")) {
 			res.registerAdvancement();
 			this.advance();
 
-			var stepValue = res.register(this.expr());
+			const browseValue = res.register(this.expr());
 			if (res.error) return res;
-		} else {
-			var stepValue = null;
-		}
-
-		while (this.currentTok.type === Flags.TT_NEWLINE) {
-			res.registerAdvancement();
-			this.advance();
-		}
-
-		if (this.currentTok.type === Flags.TT_ARROW) {
-			res.registerAdvancement();
-			this.advance();
-
+			
 			while (this.currentTok.type === Flags.TT_NEWLINE) {
 				res.registerAdvancement();
 				this.advance();
 			}
 
-			let body = res.register(this.statement());
-			if (res.error) return res;
-
-			res.registerAdvancement();
-			this.advance();
-
-			return res.success(new ForNode(varName, startValue, endValue, stepValue, body, false));
-		} else if (this.currentTok.type === Flags.TT_LBRACKET) {
-			res.registerAdvancement();
-			this.advance();
-
-			let body = res.register(this.statements());
-			if (res.error) return res;
-
-			if (this.currentTok.type === Flags.TT_RBRACKET) {
+			if (this.currentTok.type === Flags.TT_ARROW) {
 				res.registerAdvancement();
 				this.advance();
+	
+				while (this.currentTok.type === Flags.TT_NEWLINE) {
+					res.registerAdvancement();
+					this.advance();
+				}
+	
+				let body = res.register(this.statement());
+				if (res.error) return res;
+	
+				res.registerAdvancement();
+				this.advance();
+	
+				return res.success(new ForOfNode(varName, browseValue, body, false));
+			} else if (this.currentTok.type === Flags.TT_LBRACKET) {
+				res.registerAdvancement();
+				this.advance();
+	
+				let body = res.register(this.statements());
+				if (res.error) return res;
+	
+				if (this.currentTok.type !== Flags.TT_RBRACKET) {
+					return res.failure(new Errors.InvalidSyntaxError(
+						this.currentTok.posStart, this.currentTok.posEnd,
+						"Expected '}'"
+					));
+				}
+
+				res.registerAdvancement();
+				this.advance();
+	
+				return res.success(new ForOfNode(varName, browseValue, body, true));
+			}
+		} else {
+			let startValue = res.register(this.expr());
+			if (res.error) return res;
+	
+			if (this.currentTok.matches(Flags.TT_KEYWORD, "to")) {
+				res.registerAdvancement();
+				this.advance();
+		
+				let endValue = res.register(this.expr());
+				if (res.error) return res;
+		
+				if (this.currentTok.matches(Flags.TT_KEYWORD, "inc")) {
+					res.registerAdvancement();
+					this.advance();
+		
+					var stepValue = res.register(this.expr());
+					if (res.error) return res;
+				} else {
+					var stepValue = null;
+				}
+		
+				while (this.currentTok.type === Flags.TT_NEWLINE) {
+					res.registerAdvancement();
+					this.advance();
+				}
+		
+				if (this.currentTok.type === Flags.TT_ARROW) {
+					res.registerAdvancement();
+					this.advance();
+		
+					while (this.currentTok.type === Flags.TT_NEWLINE) {
+						res.registerAdvancement();
+						this.advance();
+					}
+		
+					let body = res.register(this.statement());
+					if (res.error) return res;
+		
+					res.registerAdvancement();
+					this.advance();
+		
+					return res.success(new ForInNode(varName, startValue, endValue, stepValue, body, false));
+				} else if (this.currentTok.type === Flags.TT_LBRACKET) {
+					res.registerAdvancement();
+					this.advance();
+		
+					let body = res.register(this.statements());
+					if (res.error) return res;
+		
+					if (this.currentTok.type !== Flags.TT_RBRACKET) {
+						return res.failure(new Errors.InvalidSyntaxError(
+							this.currentTok.posStart, this.currentTok.posEnd,
+							"Expected '}'"
+						));
+					}
+	
+					res.registerAdvancement();
+					this.advance();
+		
+					return res.success(new ForInNode(varName, startValue, endValue, stepValue, body, true));
+				}
 			} else {
 				return res.failure(new Errors.InvalidSyntaxError(
 					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '{' or '->'"
+					"Expected 'to'"
 				));
 			}
-
-			return res.success(new ForNode(varName, startValue, endValue, stepValue, body, true));
 		}
 	}
 
