@@ -1,7 +1,7 @@
 {
   "name": "cassouscript",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.3",
+  "description": "The best programming language",
   "main": "cassouscript.js",
   "type": "module",
   "scripts": {
@@ -9,8 +9,8 @@
     "shell": "node ./shell"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "DU CASSOULET <cassoulex@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.27.2",
     "better-sqlite3": "^7.6.2",
@@ -19,5 +19,7 @@
     "express": "^4.18.1",
     "prompt-sync": "^4.2.0",
     "quick.db": "^9.0.6"
-  }
+  },
+  "repository": "https://github.com/du-cassoulet/cassou-script.git",
+  "private": false
 }
