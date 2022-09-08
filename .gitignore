@@ -103,8 +103,14 @@ dist
 # TernJS port file
 .tern-port
 
+# Package folders
 node_modules/
 scripts/
 
+# Package files
 yarn.lock
 package-lock.json
+
+# Replit
+.replit
+replit.nix
