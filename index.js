@@ -22,20 +22,25 @@ globalSymbolTable.set("size", BuiltInFunction.size);
 globalSymbolTable.set("integer", BuiltInFunction.integer);
 globalSymbolTable.set("float", BuiltInFunction.float);
 globalSymbolTable.set("string", BuiltInFunction.string);
+globalSymbolTable.set("waitfor", BuiltInFunction.waitfor);
+globalSymbolTable.set("import", BuiltInFunction.import);
+globalSymbolTable.set("keys", BuiltInFunction.keys);
+globalSymbolTable.set("values", BuiltInFunction.values);
+globalSymbolTable.set("entries", BuiltInFunction.entries);
 
 export function run(fn, text) {
-  let lexer = new Lexer(fn, text);
-  let [tokens, error] = lexer.makeToken();
-  if (error) return [null, error];
-  
-  let parser = new Parser(tokens);
-  let ast = parser.parse();
-  if (ast.error) return [null, ast.error];
+	let lexer = new Lexer(fn, text);
+	let [tokens, error] = lexer.makeToken();
+	if (error) return [null, error];
 
-  let interpreter = new Interpreter();
-  let context = new Context("<program>");
-  context.symbolTable = globalSymbolTable;
-  let result = interpreter.visit(ast.node, context);
+	let parser = new Parser(tokens);
+	let ast = parser.parse();
+	if (ast.error) return [null, ast.error];
 
-  return [result.value, result.error];
+	let interpreter = new Interpreter();
+	let context = new Context("<program>");
+	context.symbolTable = globalSymbolTable;
+	let result = interpreter.visit(ast.node, context);
+
+	return [result.value, result.error];
 }

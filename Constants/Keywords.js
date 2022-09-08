@@ -19,5 +19,6 @@ export default [
   "NaN",
   "switch",
   "case",
-  "default"
+  "default",
+	"each"
 ]

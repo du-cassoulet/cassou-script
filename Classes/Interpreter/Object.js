@@ -14,6 +14,14 @@ class Object extends Value {
     return copy;
   }
 
+	addedTo(other) {
+		if (other instanceof Object) {
+			return [new Object([...this.elements, ...other.elements]), null];
+		} else {
+			return [null, this.illegalOperation(this.posStart, this.posEnd)];
+		}
+	}
+
   toString(tabNum = 0) {
     let tab = "";
     for (let i = 0; i < tabNum; i++) tab += " ";
