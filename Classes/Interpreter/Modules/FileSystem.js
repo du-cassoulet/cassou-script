@@ -12,12 +12,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 class FileSystem {
 	constructor() {
-		this.name = "csc-filesystem"
+		this.name = "csc-filesystem";
 	}
 
 	value_writeFile() {
-		BuiltInFunction.prototype.args_writeFile = ["fileName", "value", "encodage"];
-		BuiltInFunction.prototype.execute_writeFile = function(execCtx) {
+		BuiltInFunction.prototype.args_writeFile = [
+			"fileName",
+			"value",
+			"encodage",
+		];
+		BuiltInFunction.prototype.execute_writeFile = function (execCtx) {
 			const fileName = execCtx.symbolTable.get("fileName");
 			const value = execCtx.symbolTable.get("value");
 			const encodage = execCtx.symbolTable.get("encodage");
@@ -28,12 +32,12 @@ class FileSystem {
 				encodage.value
 			);
 			return new RTResult().success(new Void(null));
-		}
+		};
 	}
 
 	value_readFile() {
 		BuiltInFunction.prototype.args_readFile = ["fileName", "encodage"];
-		BuiltInFunction.prototype.execute_readFile = function(execCtx) {
+		BuiltInFunction.prototype.execute_readFile = function (execCtx) {
 			const fileName = execCtx.symbolTable.get("fileName");
 			const encodage = execCtx.symbolTable.get("encodage");
 
@@ -42,7 +46,7 @@ class FileSystem {
 				encodage.value
 			);
 			return new RTResult().success(new String(value));
-		}
+		};
 	}
 
 	run() {
@@ -51,8 +55,8 @@ class FileSystem {
 
 		return new ObjectClass([
 			new List(["writeFile", new BuiltInFunction("writeFile")]),
-			new List(["readFile", new BuiltInFunction("readFile")])
-		])
+			new List(["readFile", new BuiltInFunction("readFile")]),
+		]);
 	}
 }
 

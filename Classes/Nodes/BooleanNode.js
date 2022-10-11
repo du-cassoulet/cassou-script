@@ -1,14 +1,14 @@
 class BooleanNode {
-  constructor(tok) {
-    this.tok = tok;
+	constructor(tok) {
+		this.tok = tok;
 
-    this.posStart = this.tok.posStart;
-    this.posEnd = this.tok.posEnd;
-  }
+		this.posStart = this.tok.posStart;
+		this.posEnd = this.tok.posEnd;
+	}
 
-  toString() {
-    return `${this.tok}`;
-  }
+	toString() {
+		return `${this.tok}`;
+	}
 }
 
 export default BooleanNode;

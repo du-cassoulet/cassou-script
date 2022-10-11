@@ -12,7 +12,7 @@ import String from "./String.js";
 import List from "./List.js";
 import ObjectClass from "./Object.js";
 import Void from "./Void.js";
-import { run } from "../../index.js"
+import { run } from "../../index.js";
 import Converter from "../Converter.js";
 import PromiseClass from "./Promise.js";
 import Function from "./Function.js";
@@ -109,23 +109,31 @@ class BuiltInFunction extends BaseFunction {
 			const input = prompt(value.value);
 			return new RTResult().success(new String(input));
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				value.posStart, value.posEnd,
-				"Ask value must be a string"
-			));
-		};
+			return new RTResult().failure(
+				new Errors.TypingError(
+					value.posStart,
+					value.posEnd,
+					"Ask value must be a string"
+				)
+			);
+		}
 	}
 
 	execute_keys(execCtx) {
 		const object = execCtx.symbolTable.get("object");
 
 		if (object instanceof ObjectClass) {
-			return new RTResult().success(new List(object.elements.map((e) => new String(e.elements[0]))));
+			return new RTResult().success(
+				new List(object.elements.map((e) => new String(e.elements[0])))
+			);
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				object.posStart, object.posEnd,
-				"Ask value must be an object"
-			));
+			return new RTResult().failure(
+				new Errors.TypingError(
+					object.posStart,
+					object.posEnd,
+					"Ask value must be an object"
+				)
+			);
 		}
 	}
 
@@ -133,12 +141,17 @@ class BuiltInFunction extends BaseFunction {
 		const object = execCtx.symbolTable.get("object");
 
 		if (object instanceof ObjectClass) {
-			return new RTResult().success(new List(object.elements.map((e) => e.elements[1])));
+			return new RTResult().success(
+				new List(object.elements.map((e) => e.elements[1]))
+			);
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				object.posStart, object.posEnd,
-				"Ask value must be an object"
-			));
+			return new RTResult().failure(
+				new Errors.TypingError(
+					object.posStart,
+					object.posEnd,
+					"Ask value must be an object"
+				)
+			);
 		}
 	}
 
@@ -146,12 +159,21 @@ class BuiltInFunction extends BaseFunction {
 		const object = execCtx.symbolTable.get("object");
 
 		if (object instanceof ObjectClass) {
-			return new RTResult().success(new List(object.elements.map((e) => new List([new String(e.elements[0]), e.elements[1]]))));
+			return new RTResult().success(
+				new List(
+					object.elements.map(
+						(e) => new List([new String(e.elements[0]), e.elements[1]])
+					)
+				)
+			);
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				object.posStart, object.posEnd,
-				"Ask value must be an object"
-			));
+			return new RTResult().failure(
+				new Errors.TypingError(
+					object.posStart,
+					object.posEnd,
+					"Ask value must be an object"
+				)
+			);
 		}
 	}
 
@@ -170,11 +192,14 @@ class BuiltInFunction extends BaseFunction {
 		if (value instanceof Number) {
 			return new RTResult().success(new Number(Math.round(value)));
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				value.posStart, value.posEnd,
-				"Ask value must be a number"
-			));
-		};
+			return new RTResult().failure(
+				new Errors.TypingError(
+					value.posStart,
+					value.posEnd,
+					"Ask value must be a number"
+				)
+			);
+		}
 	}
 
 	execute_floor(execCtx) {
@@ -183,11 +208,14 @@ class BuiltInFunction extends BaseFunction {
 		if (value instanceof Number) {
 			return new RTResult().success(new Number(Math.floor(value)));
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				value.posStart, value.posEnd,
-				"Ask value must be a number"
-			));
-		};
+			return new RTResult().failure(
+				new Errors.TypingError(
+					value.posStart,
+					value.posEnd,
+					"Ask value must be a number"
+				)
+			);
+		}
 	}
 
 	execute_ceil(execCtx) {
@@ -196,35 +224,45 @@ class BuiltInFunction extends BaseFunction {
 		if (value instanceof Number) {
 			return new RTResult().success(new Number(Math.ceil(value)));
 		} else {
-			return new RTResult().failure(new Errors.TypingError(
-				value.posStart, value.posEnd,
-				"Ask value must be a number"
-			));
-		};
+			return new RTResult().failure(
+				new Errors.TypingError(
+					value.posStart,
+					value.posEnd,
+					"Ask value must be a number"
+				)
+			);
+		}
 	}
 
 	execute_import(execCtx) {
 		let fn = execCtx.symbolTable.get("fn");
 
 		if (!(fn instanceof String)) {
-			return new RTResult().failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"Argument must be a string",
-				execCtx
-			));
+			return new RTResult().failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"Argument must be a string",
+					execCtx
+				)
+			);
 		}
 
 		if (fn.value.startsWith("@")) {
 			const moduleName = fn.value.slice(1);
 			const modules = new Modules();
-			const module = new modules[moduleName];
+			const module = new modules[moduleName]();
 
 			const result = module.run();
 			return new RTResult().success(result);
 		} else {
-			const rootDir = execCtx.parentEntryPos.fn.split("/").slice(0, -1).join("/");
+			const rootDir = execCtx.parentEntryPos.fn
+				.split("/")
+				.slice(0, -1)
+				.join("/");
 			let file = path.join(__dirname, "../../", rootDir, fn.value);
-			if (!fs.existsSync(file)) file = path.join(__dirname, "../../", rootDir, fn.value + ".csc");
+			if (!fs.existsSync(file))
+				file = path.join(__dirname, "../../", rootDir, fn.value + ".csc");
 
 			try {
 				const script = fs.readFileSync(file, "utf-8");
@@ -236,21 +274,27 @@ class BuiltInFunction extends BaseFunction {
 					let [result, error] = run(file, script);
 
 					if (error) {
-						return new RTResult().failure(new Errors.RTError(
-							this.posStart, this.posEnd,
-							`Failed to load script "${file}"\n${error.asString()}`,
-							execCtx
-						));
+						return new RTResult().failure(
+							new Errors.RTError(
+								this.posStart,
+								this.posEnd,
+								`Failed to load script "${file}"\n${error.asString()}`,
+								execCtx
+							)
+						);
 					}
 
 					return new RTResult().success(result);
 				}
 			} catch (e) {
-				return new RTResult().failure(new Errors.RTError(
-					this.posStart, this.posEnd,
-					`Failed to load script "${file}"\n${e}`,
-					execCtx
-				));
+				return new RTResult().failure(
+					new Errors.RTError(
+						this.posStart,
+						this.posEnd,
+						`Failed to load script "${file}"\n${e}`,
+						execCtx
+					)
+				);
 			}
 		}
 	}
@@ -260,19 +304,25 @@ class BuiltInFunction extends BaseFunction {
 		let array = execCtx.symbolTable.get("array");
 
 		if (!(join instanceof String)) {
-			return new RTResult().failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"Argument must be a string",
-				execCtx
-			));
+			return new RTResult().failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"Argument must be a string",
+					execCtx
+				)
+			);
 		}
 
 		if (!(array instanceof List)) {
-			return new RTResult().failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"Argument must be a list",
-				execCtx
-			));
+			return new RTResult().failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"Argument must be a list",
+					execCtx
+				)
+			);
 		}
 
 		return new RTResult().success(
@@ -284,19 +334,18 @@ class BuiltInFunction extends BaseFunction {
 		let element = execCtx.symbolTable.get("element");
 
 		if (element instanceof List) {
-			return new RTResult().success(
-				new Number(element.elements.length)
-			);
+			return new RTResult().success(new Number(element.elements.length));
 		} else if (element instanceof String) {
-			return new RTResult().success(
-				new Number(element.value.length)
-			);
+			return new RTResult().success(new Number(element.value.length));
 		} else {
-			return new RTResult().failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"Argument must be a list or a string",
-				execCtx
-			));
+			return new RTResult().failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"Argument must be a list or a string",
+					execCtx
+				)
+			);
 		}
 	}
 
@@ -308,9 +357,7 @@ class BuiltInFunction extends BaseFunction {
 			return res.success(new Void(NaN));
 		}
 
-		return res.success(
-			new Number(parseInt(val.value))
-		);
+		return res.success(new Number(parseInt(val.value)));
 	}
 
 	execute_float(execCtx) {
@@ -321,16 +368,12 @@ class BuiltInFunction extends BaseFunction {
 			return res.success(new Void(NaN));
 		}
 
-		return res.success(
-			new Number(parseFloat(val.value))
-		);
+		return res.success(new Number(parseFloat(val.value)));
 	}
 
 	exeute_string(execCtx) {
 		let val = execCtx.symbolTable.get("val");
-		return new RTResult().success(
-			new String(val.value.toString())
-		);
+		return new RTResult().success(new String(val.value.toString()));
 	}
 
 	execute_fetch(execCtx) {
@@ -338,26 +381,38 @@ class BuiltInFunction extends BaseFunction {
 		let converter = new Converter();
 		let request = execCtx.symbolTable.get("request");
 
-		let url = request.elements.find((e) => e.elements[0] === "url")?.elements?.[1];
-		let method = request.elements.find((e) => e.elements[0] === "method")?.elements?.[1];
-		let data = converter.nodeToValue(request.elements.find((e) => e.elements[0] === "data")?.elements?.[1]);
-		let headers = converter.nodeToValue(request.elements.find((e) => e.elements[0] === "headers")?.elements?.[1]);
+		console.log(request.elements);
+		let url = request.elements.find((e) => e.elements[0] === "url")
+			?.elements?.[1];
+		let method = request.elements.find((e) => e.elements[0] === "method")
+			?.elements?.[1];
+		let data = converter.nodeToValue(
+			request.elements.find((e) => e.elements[0] === "data")?.elements?.[1]
+		);
+		let headers = converter.nodeToValue(
+			request.elements.find((e) => e.elements[0] === "headers")?.elements?.[1]
+		);
 
 		if (!url) {
-			return res.failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"'url' argument is required",
-				execCtx
-			));
+			return res.failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"'url' argument is required",
+					execCtx
+				)
+			);
 		}
 
 		return res.success(
-			new PromiseClass(axios({
-				url: url?.value,
-				method: method?.value || "GET",
-				data: data,
-				headers: headers
-			}))
+			new PromiseClass(
+				axios({
+					url: url?.value,
+					method: method?.value || "GET",
+					data: data,
+					headers: headers,
+				})
+			)
 		);
 	}
 
@@ -369,11 +424,14 @@ class BuiltInFunction extends BaseFunction {
 		let converter = new Converter();
 
 		if (!(callback instanceof Function)) {
-			return res.failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"This value must be a function",
-				execCtx
-			));
+			return res.failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"This value must be a function",
+					execCtx
+				)
+			);
 		}
 
 		if (promises instanceof PromiseClass) {
@@ -417,11 +475,14 @@ class BuiltInFunction extends BaseFunction {
 
 			return res.success(new PromiseClass(resolveValue));
 		} else {
-			return res.failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"This value must be a List or a Promise",
-				execCtx
-			));
+			return res.failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"This value must be a List or a Promise",
+					execCtx
+				)
+			);
 		}
 	}
 
@@ -430,11 +491,14 @@ class BuiltInFunction extends BaseFunction {
 		let ms = execCtx.symbolTable.get("ms");
 
 		if (!(ms instanceof Number)) {
-			return res.failure(new Errors.RTError(
-				this.posStart, this.posEnd,
-				"This value must be a number",
-				execCtx
-			));
+			return res.failure(
+				new Errors.RTError(
+					this.posStart,
+					this.posEnd,
+					"This value must be a number",
+					execCtx
+				)
+			);
 		}
 
 		let promise = new Promise((resolve) => setTimeout(resolve, ms));

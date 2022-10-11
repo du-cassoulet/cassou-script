@@ -55,10 +55,13 @@ class Parser {
 	parse() {
 		let res = this.statements();
 		if (!res.error && this.currentTok.type !== Flags.TT_EOF) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '+', '-', '*' or '/'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '+', '-', '*' or '/'"
+				)
+			);
 		}
 		return res;
 	}
@@ -71,7 +74,7 @@ class Parser {
 		if (this.currentTok.type === Flags.TT_LPAREN) {
 			res.registerAdvancement();
 			this.advance();
-			let argNodes = []
+			let argNodes = [];
 
 			if (this.currentTok.type === Flags.TT_RPAREN) {
 				res.registerAdvancement();
@@ -79,10 +82,13 @@ class Parser {
 			} else {
 				argNodes.push(res.register(this.expr()));
 				if (res.error) {
-					return res.failure(new Errors.InvalidSyntaxError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected ')', 'set', 'func', 'while', 'for', 'if', int, float or identifier"
-					));
+					return res.failure(
+						new Errors.InvalidSyntaxError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected ')', 'set', 'func', 'while', 'for', 'if', int, float or identifier"
+						)
+					);
 				}
 
 				while (this.currentTok.type === Flags.TT_COMMA) {
@@ -94,10 +100,13 @@ class Parser {
 				}
 
 				if (this.currentTok.type !== Flags.TT_RPAREN) {
-					return res.failure(new Errors.InvalidSyntaxError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected ')' or ','"
-					));
+					return res.failure(
+						new Errors.InvalidSyntaxError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected ')' or ','"
+						)
+					);
 				}
 
 				res.registerAdvancement();
@@ -141,7 +150,7 @@ class Parser {
 			this.advance();
 			return res.success(new VoidNode(tok));
 		} else if (tok.type === Flags.TT_IDENTIFIER) {
-			res.registerAdvancement()
+			res.registerAdvancement();
 			this.advance();
 			let path = [];
 
@@ -150,20 +159,21 @@ class Parser {
 				this.advance();
 
 				if (
-					[
-						Flags.TT_STRING,
-						Flags.TT_INT,
-						Flags.TT_IDENTIFIER
-					].includes(this.currentTok.type)
+					[Flags.TT_STRING, Flags.TT_INT, Flags.TT_IDENTIFIER].includes(
+						this.currentTok.type
+					)
 				) {
 					path.push(this.currentTok);
 					res.registerAdvancement();
 					this.advance();
 				} else {
-					return res.failure(new Errors.ExpectedCharError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected a string or an int"
-					));
+					return res.failure(
+						new Errors.ExpectedCharError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected a string or an int"
+						)
+					);
 				}
 			}
 
@@ -174,8 +184,9 @@ class Parser {
 				if (res.error) return res;
 				return res.success(new VarReAssignNode(tok, path, expr));
 			} else if (
-				[Flags.TT_PLE, Flags.TT_MIE, Flags.TT_MUE, Flags.TT_DIE]
-					.includes(this.currentTok.type)
+				[Flags.TT_PLE, Flags.TT_MIE, Flags.TT_MUE, Flags.TT_DIE].includes(
+					this.currentTok.type
+				)
 			) {
 				let operatorTok = this.currentTok;
 				res.registerAdvancement();
@@ -188,20 +199,23 @@ class Parser {
 
 			return res.success(new VarAccessNode(tok, path));
 		} else if (tok.type === Flags.TT_LPAREN) {
-			res.registerAdvancement()
+			res.registerAdvancement();
 			this.advance();
 			let expr = res.register(this.expr());
 			if (res.error) return res;
 
 			if (this.currentTok.type === Flags.TT_RPAREN) {
-				res.registerAdvancement()
+				res.registerAdvancement();
 				this.advance();
 				return res.success(expr);
 			} else {
-				return res.failure(new Errors.ExpectedCharError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected ')'"
-				));
+				return res.failure(
+					new Errors.ExpectedCharError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected ')'"
+					)
+				);
 			}
 		} else if (tok.matches(Flags.TT_KEYWORD, "new")) {
 			let instanceExpr = res.register(this.instanceExpr());
@@ -237,20 +251,26 @@ class Parser {
 			return res.success(funcDef);
 		}
 
-		return res.failure(new Errors.InvalidSyntaxError(
-			this.currentTok.posStart, this.currentTok.posEnd,
-			"Expected int, float, identifier, 'set', '+', '-', '('"
-		));
+		return res.failure(
+			new Errors.InvalidSyntaxError(
+				this.currentTok.posStart,
+				this.currentTok.posEnd,
+				"Expected int, float, identifier, 'set', '+', '-', '('"
+			)
+		);
 	}
 
 	funcDef() {
 		let res = new ParseResult();
 
 		if (!this.currentTok.matches(Flags.TT_KEYWORD, "func")) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'func'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'func'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -262,19 +282,25 @@ class Parser {
 			this.advance();
 
 			if (this.currentTok.type !== Flags.TT_LPAREN) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '('"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '('"
+					)
+				);
 			}
 		} else {
 			var varNameTok = null;
 
 			if (this.currentTok.type !== Flags.TT_LPAREN) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '('"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '('"
+					)
+				);
 			}
 		}
 
@@ -292,10 +318,13 @@ class Parser {
 				this.advance();
 
 				if (this.currentTok.type !== Flags.TT_IDENTIFIER) {
-					return res.failure(new Errors.InvalidSyntaxError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected identifier"
-					));
+					return res.failure(
+						new Errors.InvalidSyntaxError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected identifier"
+						)
+					);
 				}
 
 				argNameToks.push(this.currentTok);
@@ -304,17 +333,23 @@ class Parser {
 			}
 
 			if (this.currentTok.type !== Flags.TT_RPAREN) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected ',' or ')'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected ',' or ')'"
+					)
+				);
 			}
 		} else {
 			if (this.currentTok.type !== Flags.TT_RPAREN) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected ',' or ')'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected ',' or ')'"
+					)
+				);
 			}
 		}
 
@@ -327,12 +362,9 @@ class Parser {
 			let nodeToReturn = res.register(this.expr());
 			if (res.error) return res;
 
-			return res.success(new FuncDefNode(
-				varNameTok,
-				argNameToks,
-				nodeToReturn,
-				true
-			));
+			return res.success(
+				new FuncDefNode(varNameTok, argNameToks, nodeToReturn, true)
+			);
 		} else if (this.currentTok.type === Flags.TT_LBRACKET) {
 			res.registerAdvancement();
 			this.advance();
@@ -341,26 +373,27 @@ class Parser {
 			if (res.error) return res;
 
 			if (this.currentTok.type !== Flags.TT_RBRACKET) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '}'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '}'"
+					)
+				);
 			}
 
 			res.registerAdvancement();
 			this.advance();
 
-			return res.success(new FuncDefNode(
-				varNameTok,
-				argNameToks,
-				body,
-				false
-			));
+			return res.success(new FuncDefNode(varNameTok, argNameToks, body, false));
 		} else {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '{' or '->'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '{' or '->'"
+				)
+			);
 		}
 	}
 
@@ -368,10 +401,13 @@ class Parser {
 		let res = new ParseResult();
 
 		if (!this.currentTok.matches(Flags.TT_KEYWORD, "switch")) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'switch'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'switch'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -381,10 +417,13 @@ class Parser {
 		if (res.error) return res;
 
 		if (this.currentTok.type !== Flags.TT_LBRACKET) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '{'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '{'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -439,25 +478,34 @@ class Parser {
 					if (res.error) return res;
 
 					if (this.currentTok.type !== Flags.TT_RBRACKET) {
-						return res.failure(new Errors.InvalidSyntaxError(
-							this.currentTok.posStart, this.currentTok.posEnd,
-							"Expected '}'"
-						));
+						return res.failure(
+							new Errors.InvalidSyntaxError(
+								this.currentTok.posStart,
+								this.currentTok.posEnd,
+								"Expected '}'"
+							)
+						);
 					}
 
 					res.registerAdvancement();
 					this.advance();
 				} else {
-					return res.failure(new Errors.InvalidSyntaxError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected '{' or '->'"
-					));
+					return res.failure(
+						new Errors.InvalidSyntaxError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected '{' or '->'"
+						)
+					);
 				}
 			} else {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected 'case', 'default' or '}'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected 'case', 'default' or '}'"
+					)
+				);
 			}
 
 			while (this.currentTok.type === Flags.TT_NEWLINE) {
@@ -467,20 +515,19 @@ class Parser {
 		}
 
 		if (this.currentTok.type !== Flags.TT_RBRACKET) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'case', 'default' or '}'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'case', 'default' or '}'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
 		this.advance();
 
-		return res.success(new SwitchNode(
-			switchTok,
-			caseNodes,
-			defaultNode
-		));
+		return res.success(new SwitchNode(switchTok, caseNodes, defaultNode));
 	}
 
 	caseExpr() {
@@ -488,10 +535,13 @@ class Parser {
 		let shouldReturnNull = true;
 
 		if (!this.currentTok.matches(Flags.TT_KEYWORD, "case")) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'case'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'case'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -525,19 +575,25 @@ class Parser {
 			if (res.error) return res;
 
 			if (this.currentTok.type !== Flags.TT_RBRACKET) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '}'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '}'"
+					)
+				);
 			}
 
 			res.registerAdvancement();
 			this.advance();
 		} else {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '{' or '->'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '{' or '->'"
+				)
+			);
 		}
 
 		return res.success([condition, body, shouldReturnNull]);
@@ -545,14 +601,17 @@ class Parser {
 
 	listExpr() {
 		let res = new ParseResult();
-		let elementNodes = []
+		let elementNodes = [];
 		let posStart = this.currentTok.posStart.copy();
 
 		if (this.currentTok.type !== Flags.TT_LSQUARE) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '['"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '['"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -569,10 +628,13 @@ class Parser {
 		} else {
 			elementNodes.push(res.register(this.expr()));
 			if (res.error) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected ']', 'set', 'func', 'while', 'for', 'if', int, float or identifier"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected ']', 'set', 'func', 'while', 'for', 'if', int, float or identifier"
+					)
+				);
 			}
 
 			while (this.currentTok.type === Flags.TT_COMMA) {
@@ -594,21 +656,22 @@ class Parser {
 			}
 
 			if (this.currentTok.type !== Flags.TT_RSQUARE) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected ']' or ','"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected ']' or ','"
+					)
+				);
 			}
 
 			res.registerAdvancement();
 			this.advance();
 		}
 
-		return res.success(new ListNode(
-			elementNodes,
-			posStart,
-			this.currentTok.posEnd.copy()
-		));
+		return res.success(
+			new ListNode(elementNodes, posStart, this.currentTok.posEnd.copy())
+		);
 	}
 
 	entryExpr() {
@@ -619,11 +682,17 @@ class Parser {
 			this.advance();
 		}
 
-		if (this.currentTok.type !== Flags.TT_STRING && this.currentTok.type !== Flags.TT_IDENTIFIER) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected string or identifier"
-			));
+		if (
+			this.currentTok.type !== Flags.TT_STRING &&
+			this.currentTok.type !== Flags.TT_IDENTIFIER
+		) {
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected string or identifier"
+				)
+			);
 		}
 
 		const key = this.currentTok;
@@ -636,10 +705,13 @@ class Parser {
 		}
 
 		if (this.currentTok.type !== Flags.TT_DBDOT) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected ':'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected ':'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -662,10 +734,13 @@ class Parser {
 		let posStart = this.currentTok.posStart.copy();
 
 		if (this.currentTok.type !== Flags.TT_LBRACKET) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '{'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '{'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -677,10 +752,13 @@ class Parser {
 		} else {
 			elementNodes.push(res.register(this.entryExpr()));
 			if (res.error) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected ']', 'set', 'func', 'while', 'for', 'if', int, float or identifier"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected ']', 'set', 'func', 'while', 'for', 'if', int, float or identifier"
+					)
+				);
 			}
 
 			while (this.currentTok.type === Flags.TT_COMMA) {
@@ -697,41 +775,48 @@ class Parser {
 			}
 
 			if (this.currentTok.type !== Flags.TT_RBRACKET) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '}' or ','"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '}' or ','"
+					)
+				);
 			}
 
 			res.registerAdvancement();
 			this.advance();
 		}
 
-		return res.success(new ObjectNode(
-			elementNodes,
-			posStart,
-			this.currentTok.posEnd.copy()
-		));
+		return res.success(
+			new ObjectNode(elementNodes, posStart, this.currentTok.posEnd.copy())
+		);
 	}
 
 	forExpr() {
 		let res = new ParseResult();
 
 		if (!this.currentTok.matches(Flags.TT_KEYWORD, "for")) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'for'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'for'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
 		this.advance();
 
 		if (this.currentTok.type !== Flags.TT_IDENTIFIER) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected identifier"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected identifier"
+				)
+			);
 		}
 
 		let varName = this.currentTok;
@@ -739,10 +824,13 @@ class Parser {
 		this.advance();
 
 		if (this.currentTok.type !== Flags.TT_EQ) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '='"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '='"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -754,7 +842,7 @@ class Parser {
 
 			const browseValue = res.register(this.expr());
 			if (res.error) return res;
-			
+
 			while (this.currentTok.type === Flags.TT_NEWLINE) {
 				res.registerAdvancement();
 				this.advance();
@@ -763,104 +851,117 @@ class Parser {
 			if (this.currentTok.type === Flags.TT_ARROW) {
 				res.registerAdvancement();
 				this.advance();
-	
+
 				while (this.currentTok.type === Flags.TT_NEWLINE) {
 					res.registerAdvancement();
 					this.advance();
 				}
-	
+
 				let body = res.register(this.statement());
 				if (res.error) return res;
-	
+
 				res.registerAdvancement();
 				this.advance();
-	
+
 				return res.success(new ForOfNode(varName, browseValue, body, false));
 			} else if (this.currentTok.type === Flags.TT_LBRACKET) {
 				res.registerAdvancement();
 				this.advance();
-	
+
 				let body = res.register(this.statements());
 				if (res.error) return res;
-	
+
 				if (this.currentTok.type !== Flags.TT_RBRACKET) {
-					return res.failure(new Errors.InvalidSyntaxError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected '}'"
-					));
+					return res.failure(
+						new Errors.InvalidSyntaxError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected '}'"
+						)
+					);
 				}
 
 				res.registerAdvancement();
 				this.advance();
-	
+
 				return res.success(new ForOfNode(varName, browseValue, body, true));
 			}
 		} else {
 			let startValue = res.register(this.expr());
 			if (res.error) return res;
-	
+
 			if (this.currentTok.matches(Flags.TT_KEYWORD, "to")) {
 				res.registerAdvancement();
 				this.advance();
-		
+
 				let endValue = res.register(this.expr());
 				if (res.error) return res;
-		
+
 				if (this.currentTok.matches(Flags.TT_KEYWORD, "inc")) {
 					res.registerAdvancement();
 					this.advance();
-		
+
 					var stepValue = res.register(this.expr());
 					if (res.error) return res;
 				} else {
 					var stepValue = null;
 				}
-		
+
 				while (this.currentTok.type === Flags.TT_NEWLINE) {
 					res.registerAdvancement();
 					this.advance();
 				}
-		
+
 				if (this.currentTok.type === Flags.TT_ARROW) {
 					res.registerAdvancement();
 					this.advance();
-		
+
 					while (this.currentTok.type === Flags.TT_NEWLINE) {
 						res.registerAdvancement();
 						this.advance();
 					}
-		
+
 					let body = res.register(this.statement());
 					if (res.error) return res;
-		
+
 					res.registerAdvancement();
 					this.advance();
-		
-					return res.success(new ForInNode(varName, startValue, endValue, stepValue, body, false));
+
+					return res.success(
+						new ForInNode(varName, startValue, endValue, stepValue, body, false)
+					);
 				} else if (this.currentTok.type === Flags.TT_LBRACKET) {
 					res.registerAdvancement();
 					this.advance();
-		
+
 					let body = res.register(this.statements());
 					if (res.error) return res;
-		
+
 					if (this.currentTok.type !== Flags.TT_RBRACKET) {
-						return res.failure(new Errors.InvalidSyntaxError(
-							this.currentTok.posStart, this.currentTok.posEnd,
-							"Expected '}'"
-						));
+						return res.failure(
+							new Errors.InvalidSyntaxError(
+								this.currentTok.posStart,
+								this.currentTok.posEnd,
+								"Expected '}'"
+							)
+						);
 					}
-	
+
 					res.registerAdvancement();
 					this.advance();
-		
-					return res.success(new ForInNode(varName, startValue, endValue, stepValue, body, true));
+
+					return res.success(
+						new ForInNode(varName, startValue, endValue, stepValue, body, true)
+					);
 				}
 			} else {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected 'to'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected 'to'"
+					)
+				);
 			}
 		}
 	}
@@ -869,10 +970,13 @@ class Parser {
 		let res = new ParseResult();
 
 		if (!this.currentTok.matches(Flags.TT_KEYWORD, "while")) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'while'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'while'"
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -913,10 +1017,13 @@ class Parser {
 				res.registerAdvancement();
 				this.advance();
 			} else {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '}'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '}'"
+					)
+				);
 			}
 
 			res.registerAdvancement();
@@ -924,10 +1031,13 @@ class Parser {
 
 			return res.success(new WhileNode(condition, body, true));
 		} else {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '{' or '->'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '{' or '->'"
+				)
+			);
 		}
 	}
 
@@ -968,10 +1078,13 @@ class Parser {
 					res.registerAdvancement();
 					this.advance();
 				} else {
-					return res.failure(new Errors.InvalidSyntaxError(
-						this.currentTok.posStart, this.currentTok.posEnd,
-						"Expected '}'"
-					));
+					return res.failure(
+						new Errors.InvalidSyntaxError(
+							this.currentTok.posStart,
+							this.currentTok.posEnd,
+							"Expected '}'"
+						)
+					);
 				}
 			} else {
 				let expr = res.register(this.statement());
@@ -985,7 +1098,7 @@ class Parser {
 
 	ifExprBOrC() {
 		let res = new ParseResult();
-		let cases = []
+		let cases = [];
 		let elseCase = null;
 
 		if (this.currentTok.matches(Flags.TT_KEYWORD, "elif")) {
@@ -1002,14 +1115,17 @@ class Parser {
 
 	ifExprCases(caseKeyword) {
 		let res = new ParseResult();
-		let cases = []
+		let cases = [];
 		let elseCase = null;
 
 		if (!this.currentTok.matches(Flags.TT_KEYWORD, caseKeyword)) {
-			return res.failure(Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				`Expected '${caseKeyword}'`
-			));
+			return res.failure(
+				Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					`Expected '${caseKeyword}'`
+				)
+			);
 		}
 
 		res.registerAdvancement();
@@ -1040,7 +1156,7 @@ class Parser {
 			if (res.error) return res;
 			let newCases = [];
 			[newCases, elseCase] = allCases;
-			cases = [...cases, ...newCases]
+			cases = [...cases, ...newCases];
 		} else if (this.currentTok.type === Flags.TT_LBRACKET) {
 			res.registerAdvancement();
 			this.advance();
@@ -1053,10 +1169,13 @@ class Parser {
 				res.registerAdvancement();
 				this.advance();
 			} else {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '}'"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '}'"
+					)
+				);
 			}
 
 			let allCases = res.register(this.ifExprBOrC());
@@ -1065,10 +1184,13 @@ class Parser {
 			[newCases, elseCase] = allCases;
 			cases = [...cases, ...newCases];
 		} else {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected '{' or '->'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected '{' or '->'"
+				)
+			);
 		}
 
 		return res.success([cases, elseCase]);
@@ -1083,12 +1205,12 @@ class Parser {
 		let tok = this.currentTok;
 
 		if ([Flags.TT_PLUS, Flags.TT_MINUS].includes(tok.type)) {
-			res.registerAdvancement()
+			res.registerAdvancement();
 			this.advance();
 			let factor = res.register(this.factor());
 			if (res.error) return res;
 			return res.success(new UnaryOpNode(tok, factor));
-		};
+		}
 
 		return this.power();
 	}
@@ -1114,13 +1236,25 @@ class Parser {
 			return res.success(new UnaryOpNode(opTok, node));
 		}
 
-		let node = res.register(this.binOp("arithExpr", [Flags.TT_EE, Flags.TT_NE, Flags.TT_LT, Flags.TT_GT, Flags.TT_LTE, Flags.TT_GTE]));
+		let node = res.register(
+			this.binOp("arithExpr", [
+				Flags.TT_EE,
+				Flags.TT_NE,
+				Flags.TT_LT,
+				Flags.TT_GT,
+				Flags.TT_LTE,
+				Flags.TT_GTE,
+			])
+		);
 
 		if (res.error) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected int, float, identifier, 'set', '+', '-', '(', '!'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected int, float, identifier, 'set', '+', '-', '(', '!'"
+				)
+			);
 		}
 
 		return res.success(node);
@@ -1128,7 +1262,7 @@ class Parser {
 
 	statements() {
 		let res = new ParseResult();
-		let statements = []
+		let statements = [];
 		let posStart = this.currentTok.posStart.copy();
 
 		while (this.currentTok.type === Flags.TT_NEWLINE) {
@@ -1166,11 +1300,9 @@ class Parser {
 			statements.push(statement);
 		}
 
-		return res.success(new ListNode(
-			statements,
-			posStart,
-			this.currentTok.posEnd.copy()
-		));
+		return res.success(
+			new ListNode(statements, posStart, this.currentTok.posEnd.copy())
+		);
 	}
 
 	statement() {
@@ -1184,27 +1316,36 @@ class Parser {
 			let expr = res.tryRegister(this.expr());
 			if (!expr) this.reverse(res.toReverseCount);
 
-			return res.success(new ReturnNode(expr, posStart, this.currentTok.posStart.copy()));
+			return res.success(
+				new ReturnNode(expr, posStart, this.currentTok.posStart.copy())
+			);
 		}
 
 		if (this.currentTok.matches(Flags.TT_KEYWORD, "continue")) {
 			res.registerAdvancement();
 			this.advance();
-			return res.success(new ContinueNode(posStart, this.currentTok.posStart.copy()));
+			return res.success(
+				new ContinueNode(posStart, this.currentTok.posStart.copy())
+			);
 		}
 
 		if (this.currentTok.matches(Flags.TT_KEYWORD, "break")) {
 			res.registerAdvancement();
 			this.advance();
-			return res.success(new BreakNode(posStart, this.currentTok.posStart.copy()));
+			return res.success(
+				new BreakNode(posStart, this.currentTok.posStart.copy())
+			);
 		}
 
 		let expr = res.register(this.expr());
 		if (res.error) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'return', 'continue', 'break', 'set', 'if', 'for', 'while', 'func', int, float, identifier, '+', '-', '(', '[' or '!'"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'return', 'continue', 'break', 'set', 'if', 'for', 'while', 'func', int, float, identifier, '+', '-', '(', '[' or '!'"
+				)
+			);
 		}
 
 		return res.success(expr);
@@ -1214,28 +1355,34 @@ class Parser {
 		let res = new ParseResult();
 
 		if (this.currentTok.matches(Flags.TT_KEYWORD, "set")) {
-			res.registerAdvancement()
+			res.registerAdvancement();
 			this.advance();
 
 			if (this.currentTok.type !== Flags.TT_IDENTIFIER) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected identifier"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected identifier"
+					)
+				);
 			}
 
 			let varName = this.currentTok;
-			res.registerAdvancement()
+			res.registerAdvancement();
 			this.advance();
 
 			if (this.currentTok.type !== Flags.TT_EQ) {
-				return res.failure(new Errors.InvalidSyntaxError(
-					this.currentTok.posStart, this.currentTok.posEnd,
-					"Expected '='"
-				));
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected '='"
+					)
+				);
 			}
 
-			res.registerAdvancement()
+			res.registerAdvancement();
 			this.advance();
 
 			let expr = res.register(this.expr());
@@ -1248,25 +1395,34 @@ class Parser {
 			this.advance();
 
 			let expr = res.tryRegister(this.expr());
-			if (!expr) return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected int, float, identifier, string, object, list"
-			));
+			if (!expr)
+				return res.failure(
+					new Errors.InvalidSyntaxError(
+						this.currentTok.posStart,
+						this.currentTok.posEnd,
+						"Expected int, float, identifier, string, object, list"
+					)
+				);
 
 			return res.success(new TypeNode(expr, null));
 		}
 
-		let node = res.register(this.binOp("compExpr", [
-			Flags.TT_AND,
-			Flags.TT_OR,
-			[Flags.TT_KEYWORD, "in"]
-		]));
+		let node = res.register(
+			this.binOp("compExpr", [
+				Flags.TT_AND,
+				Flags.TT_OR,
+				[Flags.TT_KEYWORD, "in"],
+			])
+		);
 		if (res.error) {
-			return res.failure(new Errors.InvalidSyntaxError(
-				this.currentTok.posStart, this.currentTok.posEnd,
-				"Expected 'set', int, float, identifier, '+', '-' or '('"
-			));
-		};
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					this.currentTok.posStart,
+					this.currentTok.posEnd,
+					"Expected 'set', int, float, identifier, '+', '-' or '('"
+				)
+			);
+		}
 
 		return res.success(node);
 	}
@@ -1279,7 +1435,10 @@ class Parser {
 		let left = res.register(this[funca]());
 		if (res.error) return res;
 
-		while (ops.includes(this.currentTok.type) || ops.find((e) => this.currentTok.matches(e[0], e[1]))) {
+		while (
+			ops.includes(this.currentTok.type) ||
+			ops.find((e) => this.currentTok.matches(e[0], e[1]))
+		) {
 			let opTok = this.currentTok;
 			this.advance();
 			let right = res.register(this[funcb]());

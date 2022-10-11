@@ -12,7 +12,7 @@ import Void from "./Interpreter/Void.js";
 import Type from "./Interpreter/Type.js";
 
 class Interpreter {
-	constructor() { }
+	constructor() {}
 
 	visit(node, context) {
 		let methodName = `visit_${node.constructor.name}`;
@@ -44,7 +44,9 @@ class Interpreter {
 
 	visit_NumberNode(node, context) {
 		return new RTResult().success(
-			new Number(node.tok.value).setContext(context).setPos(node.posStart, node.posEnd)
+			new Number(node.tok.value)
+				.setContext(context)
+				.setPos(node.posStart, node.posEnd)
 		);
 	}
 
@@ -72,13 +74,17 @@ class Interpreter {
 		}
 
 		return res.success(
-			new Object(elements).setContext(context).setPos(node.posStart, node.posEnd)
+			new Object(elements)
+				.setContext(context)
+				.setPos(node.posStart, node.posEnd)
 		);
 	}
 
 	visit_StringNode(node, context) {
 		return new RTResult().success(
-			new String(node.tok.value).setContext(context).setPos(node.posStart, node.posEnd)
+			new String(node.tok.value)
+				.setContext(context)
+				.setPos(node.posStart, node.posEnd)
 		);
 	}
 
@@ -93,7 +99,9 @@ class Interpreter {
 		if (res.shouldReturn()) return res;
 
 		return res.success(
-			new List([keyName.value, value]).setContext(context).setPos(node.posStart, node.posEnd)
+			new List([keyName.value, value])
+				.setContext(context)
+				.setPos(node.posStart, node.posEnd)
 		);
 	}
 
@@ -103,11 +111,14 @@ class Interpreter {
 		let value = context.symbolTable.get(varName);
 
 		if (!value) {
-			return res.failure(new Errors.RTError(
-				node.posStart, node.posEnd,
-				`'${varName}' is not defined`,
-				context
-			));
+			return res.failure(
+				new Errors.RTError(
+					node.posStart,
+					node.posEnd,
+					`'${varName}' is not defined`,
+					context
+				)
+			);
 		}
 
 		for (let i in node.varPathTok) {
@@ -128,11 +139,14 @@ class Interpreter {
 		}
 
 		if (!value) {
-			return res.failure(new Errors.RTError(
-				node.posStart, node.posEnd,
-				`'${varName}' is not defined`,
-				context
-			));
+			return res.failure(
+				new Errors.RTError(
+					node.posStart,
+					node.posEnd,
+					`'${varName}' is not defined`,
+					context
+				)
+			);
 		}
 
 		value = value.copy().setContext(context).setPos(node.posStart, node.posEnd);
@@ -161,13 +175,13 @@ class Interpreter {
 		let result, error;
 
 		if (node.operatorTok.type === Flags.TT_PLE) {
-			[result, error] = varValue.addedTo(value)
+			[result, error] = varValue.addedTo(value);
 		} else if (node.operatorTok.type === Flags.TT_MIE) {
-			[result, error] = varValue.subbedBy(value)
+			[result, error] = varValue.subbedBy(value);
 		} else if (node.operatorTok.type === Flags.TT_MUE) {
-			[result, error] = varValue.multedBy(value)
+			[result, error] = varValue.multedBy(value);
 		} else if (node.operatorTok.type === Flags.TT_DIE) {
-			[result, error] = varValue.divedBy(value)
+			[result, error] = varValue.divedBy(value);
 		}
 
 		symbolTable.set(varName, result);
@@ -208,12 +222,15 @@ class Interpreter {
 									new List([e, value])
 										.setContext(context)
 										.setPos(node.posStart, node.posEnd)
-								)
+								);
 							} else {
-								return res.failure(new Errors.RTError(
-									node.posStart, node.posEnd,
-									"Invalid assignment"
-								));
+								return res.failure(
+									new Errors.RTError(
+										node.posStart,
+										node.posEnd,
+										"Invalid assignment"
+									)
+								);
 							}
 						} else {
 							if (i + 1 === node.varPathTok.length) {
@@ -225,22 +242,28 @@ class Interpreter {
 					} else if (newNode instanceof List) {
 						if (e + 1 === 0) {
 							if (i + 1 === node.varPathTok.length) {
-								newNode.elements.push(value)
+								newNode.elements.push(value);
 							} else {
-								return res.failure(new Errors.RTError(
-									node.posStart, node.posEnd,
-									"Invalid assignment"
-								));
+								return res.failure(
+									new Errors.RTError(
+										node.posStart,
+										node.posEnd,
+										"Invalid assignment"
+									)
+								);
 							}
 						} else {
 							if (i + 1 === node.varPathTok.length) {
 								newNode.elements[e] = value;
 							} else {
 								if (!newNode.elements[e]) {
-									return res.failure(new Errors.IllegalCharError(
-										node.posStart, node.posEnd,
-										`Invalid index '${e}' in list`
-									));
+									return res.failure(
+										new Errors.IllegalCharError(
+											node.posStart,
+											node.posEnd,
+											`Invalid index '${e}' in list`
+										)
+									);
 								}
 								newNode = newNode.elements[e];
 							}
@@ -250,7 +273,7 @@ class Interpreter {
 
 				context.symbolTable.set(varName, baseNode);
 			}
-		}
+		};
 
 		if (context.symbolTable.get(varName)) {
 			setValue();
@@ -411,7 +434,8 @@ class Interpreter {
 			i += stepValue.value;
 
 			let value = res.register(this.visit(node.bodyNode, context));
-			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak) return res;
+			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak)
+				return res;
 
 			if (res.loopShouldContinue) continue;
 			if (res.loopShouldBreak) break;
@@ -420,22 +444,26 @@ class Interpreter {
 		}
 
 		return res.success(
-			node.shouldReturnNull ? new Void(null) :
-				new List(elements).setContext(context).setPos(node.posStart, node.posEnd)
+			node.shouldReturnNull
+				? new Void(null)
+				: new List(elements)
+						.setContext(context)
+						.setPos(node.posStart, node.posEnd)
 		);
 	}
 
 	visit_ForOfNode(node, context) {
 		let res = new RTResult();
 		let elements = [];
-		
+
 		let browseElements = res.register(this.visit(node.listNode, context));
 
 		for (const browseElement of browseElements.elements) {
 			context.symbolTable.set(node.varNameTok.value, browseElement);
 
 			let value = res.register(this.visit(node.bodyNode, context));
-			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak) return res;
+			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak)
+				return res;
 
 			if (res.loopShouldContinue) continue;
 			if (res.loopShouldBreak) break;
@@ -444,14 +472,17 @@ class Interpreter {
 		}
 
 		return res.success(
-			node.shouldReturnNull ? new Void(null) :
-				new List(elements).setContext(context).setPos(node.posStart, node.posEnd)
+			node.shouldReturnNull
+				? new Void(null)
+				: new List(elements)
+						.setContext(context)
+						.setPos(node.posStart, node.posEnd)
 		);
 	}
 
 	visit_WhileNode(node, context) {
 		let res = new RTResult();
-		let elements = []
+		let elements = [];
 
 		while (true) {
 			let condition = res.register(this.visit(node.conditionNode, context));
@@ -460,7 +491,8 @@ class Interpreter {
 			if (!condition.isTrue()) break;
 
 			let value = res.register(this.visit(node.bodyNode, context));
-			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak) return res;
+			if (res.error && !res.loopShouldContinue && !res.loopShouldBreak)
+				return res;
 
 			if (res.loopShouldContinue) continue;
 			if (res.loopShouldBreak) break;
@@ -469,8 +501,11 @@ class Interpreter {
 		}
 
 		return res.success(
-			node.shouldReturnNull ? new Void(null) :
-				new List(elements).setContext(context).setPos(node.posStart, node.posEnd)
+			node.shouldReturnNull
+				? new Void(null)
+				: new List(elements)
+						.setContext(context)
+						.setPos(node.posStart, node.posEnd)
 		);
 	}
 
@@ -478,7 +513,12 @@ class Interpreter {
 		let funcName = node.varNameTok?.value || null;
 		let bodyNode = node.bodyNode;
 		let argNames = node.argNameToks.map((argName) => argName.value);
-		let funcValue = new Function(funcName, bodyNode, argNames, node.shouldAutoReturn)
+		let funcValue = new Function(
+			funcName,
+			bodyNode,
+			argNames,
+			node.shouldAutoReturn
+		)
 			.setContext(context)
 			.setPos(node.posStart, node.posEnd);
 
@@ -504,7 +544,10 @@ class Interpreter {
 
 		let returnValue = res.register(valueToCall.execute(args));
 		if (res.shouldReturn()) return res;
-		returnValue = returnValue.copy().setPos(node.posStart, node.posEnd).setContext(context);
+		returnValue = returnValue
+			.copy()
+			.setPos(node.posStart, node.posEnd)
+			.setContext(context);
 		return res.success(returnValue);
 	}
 
@@ -536,20 +579,26 @@ class Interpreter {
 			let value = res.register(this.visit(node.nodeElement, context));
 
 			if (!value) {
-				return res.failure(new Errors.IllegalCharError(
-					node.posStart, node.posEnd,
-					`Cannot read '${node.nodeElement.varNameTok.value}' of null`
-				));
+				return res.failure(
+					new Errors.IllegalCharError(
+						node.posStart,
+						node.posEnd,
+						`Cannot read '${node.nodeElement.varNameTok.value}' of null`
+					)
+				);
 			}
 
 			return res.success(new Type(value.constructor.name));
 		} else if (node.typeTok !== null) {
 			return res.success(new Type(node.typeTok.value));
 		} else {
-			return res.failure(new Errors.InvalidSyntaxError(
-				node.posStart, node.posEnd,
-				"Invalid element"
-			));
+			return res.failure(
+				new Errors.InvalidSyntaxError(
+					node.posStart,
+					node.posEnd,
+					"Invalid element"
+				)
+			);
 		}
 	}
 }

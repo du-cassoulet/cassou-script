@@ -13,7 +13,10 @@ class Number extends Value {
 
 	addedTo(other) {
 		if (other instanceof Number) {
-			return [new Number(this.value + other.value).setContext(this.context), null];
+			return [
+				new Number(this.value + other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -21,7 +24,10 @@ class Number extends Value {
 
 	subbedBy(other) {
 		if (other instanceof Number) {
-			return [new Number(this.value - other.value).setContext(this.context), null];
+			return [
+				new Number(this.value - other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -29,7 +35,10 @@ class Number extends Value {
 
 	multedBy(other) {
 		if (other instanceof Number) {
-			return [new Number(this.value * other.value).setContext(this.context), null];
+			return [
+				new Number(this.value * other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -38,13 +47,16 @@ class Number extends Value {
 	divedBy(other) {
 		if (other instanceof Number) {
 			if (other.value === 0) {
-				return [null, new Errors.RTError(
-					other.posStart, other.posEnd,
-					"Division by zero"
-				)]
+				return [
+					null,
+					new Errors.RTError(other.posStart, other.posEnd, "Division by zero"),
+				];
 			}
 
-			return [new Number(this.value / other.value).setContext(this.context), null];
+			return [
+				new Number(this.value / other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -52,19 +64,28 @@ class Number extends Value {
 
 	powedBy(other) {
 		if (other instanceof Number) {
-			return [new Number(this.value ** other.value).setContext(this.context), null];
+			return [
+				new Number(this.value ** other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
 	}
 
 	moduledBy(other) {
-		return [new Number(this.value % other.value).setContext(this.context), null];
+		return [
+			new Number(this.value % other.value).setContext(this.context),
+			null,
+		];
 	}
 
 	getComparisonEq(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value === other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value === other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -72,7 +93,10 @@ class Number extends Value {
 
 	getComparisonNe(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value !== other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value !== other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -80,7 +104,10 @@ class Number extends Value {
 
 	getComparisonLt(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value < other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value < other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -88,7 +115,10 @@ class Number extends Value {
 
 	getComparisonGt(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value > other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value > other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -96,7 +126,10 @@ class Number extends Value {
 
 	getComparisonLte(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value <= other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value <= other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -104,7 +137,10 @@ class Number extends Value {
 
 	getComparisonGte(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value >= other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value >= other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -112,7 +148,10 @@ class Number extends Value {
 
 	andedBy(other) {
 		if (other instanceof Number) {
-			return [new Boolean(this.value && other.value).setContext(this.context), null];
+			return [
+				new Boolean(this.value && other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -120,7 +159,10 @@ class Number extends Value {
 
 	oredBy(other) {
 		if (other instanceof Number) {
-			return [new Number(this.value || other.value).setContext(this.context), null];
+			return [
+				new Number(this.value || other.value).setContext(this.context),
+				null,
+			];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];
 		}
@@ -132,10 +174,10 @@ class Number extends Value {
 
 	isIn(other) {
 		if (other instanceof List) {
-			let includes = !!other.elements.find((e) =>
-				this.constructor.name === e.constructor.name &&
-				this.value === e.value
-			)
+			let includes = !!other.elements.find(
+				(e) =>
+					this.constructor.name === e.constructor.name && this.value === e.value
+			);
 			return [new Boolean(includes), null];
 		} else {
 			return [null, this.illegalOperation(this.posStart, this.posEnd)];

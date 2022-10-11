@@ -13,7 +13,7 @@ class Colors {
 
 	value_get() {
 		BuiltInFunction.prototype.args_get = ["path"];
-		BuiltInFunction.prototype.execute_get = function(execCtx) {
+		BuiltInFunction.prototype.execute_get = function (execCtx) {
 			let converter = new Converter();
 			let db = new QuickDB({ filePath: "./scripts/data.sqlite" });
 			let path = execCtx.symbolTable.get("path");
@@ -24,12 +24,12 @@ class Colors {
 			});
 
 			return new RTResult().success(new PromiseClass(prom));
-		}
+		};
 	}
 
 	value_set() {
 		BuiltInFunction.prototype.args_set = ["path", "val"];
-		BuiltInFunction.prototype.execute_set = function(execCtx) {
+		BuiltInFunction.prototype.execute_set = function (execCtx) {
 			let converter = new Converter();
 			let db = new QuickDB({ filePath: "./scripts/data.sqlite" });
 			let path = execCtx.symbolTable.get("path");
@@ -41,12 +41,12 @@ class Colors {
 			});
 
 			return new RTResult().success(new PromiseClass(prom));
-		}
+		};
 	}
 
 	value_add() {
 		BuiltInFunction.prototype.args_add = ["path", "val"];
-		BuiltInFunction.prototype.execute_add = function(execCtx) {
+		BuiltInFunction.prototype.execute_add = function (execCtx) {
 			let converter = new Converter();
 			let db = new QuickDB({ filePath: "./scripts/data.sqlite" });
 			let path = execCtx.symbolTable.get("path");
@@ -58,12 +58,12 @@ class Colors {
 			});
 
 			return new RTResult().success(new PromiseClass(prom));
-		}
+		};
 	}
 
 	value_push() {
 		BuiltInFunction.prototype.args_push = ["path", "val"];
-		BuiltInFunction.prototype.execute_push = function(execCtx) {
+		BuiltInFunction.prototype.execute_push = function (execCtx) {
 			let converter = new Converter();
 			let db = new QuickDB({ filePath: "./scripts/data.sqlite" });
 			let path = execCtx.symbolTable.get("path");
@@ -75,12 +75,12 @@ class Colors {
 			});
 
 			return new RTResult().success(new PromiseClass(prom));
-		}
+		};
 	}
 
 	value_pull() {
 		BuiltInFunction.prototype.args_pull = ["path", "val"];
-		BuiltInFunction.prototype.execute_pull = function(execCtx) {
+		BuiltInFunction.prototype.execute_pull = function (execCtx) {
 			let converter = new Converter();
 			let db = new QuickDB({ filePath: "./scripts/data.sqlite" });
 			let path = execCtx.symbolTable.get("path");
@@ -92,12 +92,12 @@ class Colors {
 			});
 
 			return new RTResult().success(new PromiseClass(prom));
-		}
+		};
 	}
 
 	value_all() {
 		BuiltInFunction.prototype.args_all = [];
-		BuiltInFunction.prototype.execute_all = function() {
+		BuiltInFunction.prototype.execute_all = function () {
 			let converter = new Converter();
 			let db = new QuickDB({ filePath: "./scripts/data.sqlite" });
 
@@ -107,7 +107,7 @@ class Colors {
 			});
 
 			return new RTResult().success(new PromiseClass(prom));
-		}
+		};
 	}
 
 	run() {
@@ -124,7 +124,7 @@ class Colors {
 			new List(["add", new BuiltInFunction("add")]),
 			new List(["push", new BuiltInFunction("push")]),
 			new List(["pull", new BuiltInFunction("pull")]),
-			new List(["all", new BuiltInFunction("all")])
+			new List(["all", new BuiltInFunction("all")]),
 		]);
 	}
 }

@@ -6,122 +6,114 @@ import String from "./Interpreter/String.js";
 import Void from "./Interpreter/Void.js";
 
 class Converter {
-  constructor() {
-    this.traversedProps = new Set();
-  }
+	constructor() {
+		this.traversedProps = new Set();
+	}
 
-  valueToNode(value) {
-    switch (typeof value) {
-      case "string":
-        return new String(value);
+	valueToNode(value) {
+		switch (typeof value) {
+			case "string":
+				return new String(value);
 
-      case "number":
-        return new Number(value);
+			case "number":
+				return new Number(value);
 
-      case "boolean":
-        return new Boolean(value);
+			case "boolean":
+				return new Boolean(value);
 
-      case "object":
-        return this.JSONToNodes(value);
+			case "object":
+				return this.JSONToNodes(value);
 
-      default:
-        return new Void(null);
-    }
-  }
+			default:
+				return new Void(null);
+		}
+	}
 
-  JSONToNodes(json) {
-    let elements = [];
-    if (this.traversedProps.has(json)) return new List([]);
-    this.traversedProps.add(json);
+	JSONToNodes(json) {
+		let elements = [];
+		if (this.traversedProps.has(json)) return new List([]);
+		this.traversedProps.add(json);
 
-    if (json instanceof Array) {
-      if (json) json.forEach((value) => {
-        switch (typeof value) {
-          case "string":
-            elements.push(new String(value));
-            break;
-  
-          case "number":
-            elements.push(new Number(value));
-            break;
-  
-          case "boolean":
-            elements.push(new Boolean(value));
-            break;
-  
-          case "object":
-            elements.push(this.JSONToNodes(value));
-            break;
-  
-          default:
-            elements.push(new Void(null));
-        }
-      });
+		if (json instanceof Array) {
+			if (json)
+				json.forEach((value) => {
+					switch (typeof value) {
+						case "string":
+							elements.push(new String(value));
+							break;
 
-      var obj = new List(elements);
-    } else {
-      if (json) Object.entries(json).forEach(([key, value]) => {
-        switch (typeof value) {
-          case "string":
-            elements.push(
-              new List([key, new String(value)])
-            );
-            break;
-  
-          case "number":
-            elements.push(
-              new List([key, new Number(value)])
-            );
-            break;
-  
-          case "boolean":
-            elements.push(
-              new List([key, new Boolean(value)])
-            );
-            break;
-  
-          case "object":
-            elements.push(
-              new List([key, this.JSONToNodes(value)])
-            );
-            break;
-  
-          default:
-            elements.push(
-              new List([key, new Void(null)])
-            );
-        }
-      });
+						case "number":
+							elements.push(new Number(value));
+							break;
 
-      var obj = new ObjClass(elements);
-    }
-    
-    return obj;
-  }
+						case "boolean":
+							elements.push(new Boolean(value));
+							break;
 
-  nodeToValue(node) {
-    if (node === undefined) return undefined;
-    
-    if (node instanceof ObjClass) {
-      let obj = {}
-      node.elements.forEach((e) => {
-        if (e.elements) {
-          obj[e.elements[0]] = this.nodeToValue(e.elements[1]);
-        } else {
-          obj[e[0]] = this.nodeToValue(e[1]);
-        }
-      });
-      return obj;
-    } else if (node instanceof List) {
-      if (node.elements) {
-        return node.elements.map(this.nodeToValue);
-      } else {
-        return node.map(this.nodeToValue);
-      }
-    } else {
-      return node.value;
-    }
-  }
+						case "object":
+							elements.push(this.JSONToNodes(value));
+							break;
+
+						default:
+							elements.push(new Void(null));
+					}
+				});
+
+			var obj = new List(elements);
+		} else {
+			if (json)
+				Object.entries(json).forEach(([key, value]) => {
+					switch (typeof value) {
+						case "string":
+							elements.push(new List([key, new String(value)]));
+							break;
+
+						case "number":
+							elements.push(new List([key, new Number(value)]));
+							break;
+
+						case "boolean":
+							elements.push(new List([key, new Boolean(value)]));
+							break;
+
+						case "object":
+							elements.push(new List([key, this.JSONToNodes(value)]));
+							break;
+
+						default:
+							elements.push(new List([key, new Void(null)]));
+					}
+				});
+
+			var obj = new ObjClass(elements);
+		}
+
+		return obj;
+	}
+
+	nodeToValue(node) {
+		if (node === undefined) return undefined;
+
+		if (node instanceof ObjClass) {
+			let obj = {};
+			node.elements.forEach((e) => {
+				if (e.elements) {
+					obj[e.elements[0]] = this.nodeToValue(e.elements[1]);
+				} else {
+					obj[e[0]] = this.nodeToValue(e[1]);
+				}
+			});
+			return obj;
+		} else if (node instanceof List) {
+			if (node.elements) {
+				return node.elements.map(this.nodeToValue);
+			} else {
+				return node.map(this.nodeToValue);
+			}
+		} else {
+			return node.value;
+		}
+	}
 }
 
 export default Converter;

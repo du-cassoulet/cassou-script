@@ -6,5 +6,5 @@ const code = fs.readFileSync(file, "utf-8");
 let [_, error] = run(file, code);
 
 if (error) {
-  console.log(error.asString());
+	console.log(error.asString());
 }

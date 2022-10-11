@@ -5,13 +5,13 @@ import Database from "./Interpreter/Modules/Database.js";
 import FileSystem from "./Interpreter/Modules/FileSystem.js";
 
 class Modules {
-  constructor() {
-    this["csc-http"] = Http;
-    this["csc-colors"] = Colors;
-    this["csc-websocket"] = WebSocket;
+	constructor() {
+		this["csc-http"] = Http;
+		this["csc-colors"] = Colors;
+		this["csc-websocket"] = WebSocket;
 		this["csc-database"] = Database;
 		this["csc-filesystem"] = FileSystem;
-  }
+	}
 }
 
 export default Modules;

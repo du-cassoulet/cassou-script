@@ -23,6 +23,7 @@ globalSymbolTable.set("integer", BuiltInFunction.integer);
 globalSymbolTable.set("float", BuiltInFunction.float);
 globalSymbolTable.set("string", BuiltInFunction.string);
 globalSymbolTable.set("waitfor", BuiltInFunction.waitfor);
+globalSymbolTable.set("fetch", BuiltInFunction.fetch);
 globalSymbolTable.set("import", BuiltInFunction.import);
 globalSymbolTable.set("keys", BuiltInFunction.keys);
 globalSymbolTable.set("values", BuiltInFunction.values);
