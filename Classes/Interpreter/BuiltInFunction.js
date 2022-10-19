@@ -381,7 +381,6 @@ class BuiltInFunction extends BaseFunction {
 		let converter = new Converter();
 		let request = execCtx.symbolTable.get("request");
 
-		console.log(request.elements);
 		let url = request.elements.find((e) => e.elements[0] === "url")
 			?.elements?.[1];
 		let method = request.elements.find((e) => e.elements[0] === "method")

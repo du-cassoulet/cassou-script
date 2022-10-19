@@ -217,10 +217,6 @@ class Parser {
 					)
 				);
 			}
-		} else if (tok.matches(Flags.TT_KEYWORD, "new")) {
-			let instanceExpr = res.register(this.instanceExpr());
-			if (res.error) return res;
-			return res.success(instanceExpr);
 		} else if (tok.type === Flags.TT_LSQUARE) {
 			let listExpr = res.register(this.listExpr());
 			if (res.error) return res;
