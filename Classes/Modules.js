@@ -1,6 +1,5 @@
 import Http from "./Interpreter/Modules/Http.js";
 import Colors from "./Interpreter/Modules/Colors.js";
-import WebSocket from "./Interpreter/Modules/Websocket.js";
 import Database from "./Interpreter/Modules/Database.js";
 import FileSystem from "./Interpreter/Modules/FileSystem.js";
 
@@ -8,7 +7,6 @@ class Modules {
 	constructor() {
 		this["csc-http"] = Http;
 		this["csc-colors"] = Colors;
-		this["csc-websocket"] = WebSocket;
 		this["csc-database"] = Database;
 		this["csc-filesystem"] = FileSystem;
 	}
