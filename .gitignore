@@ -114,3 +114,5 @@ package-lock.json
 # Replit
 .replit
 replit.nix
+
+.prettierignore

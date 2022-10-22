@@ -1,10 +1,13 @@
 import Flags from "../Constants/Flags.js";
 import Chars from "../Constants/Chars.js";
-import Keywords from "../Constants/Keywords.js";
 import Types from "../Constants/Types.js";
 import Errors from "./Errors.js";
 import Position from "./Position.js";
 import Token from "./Token.js";
+import ParserOptions from "./ParserOptions.js";
+
+const keywordParser = new ParserOptions();
+const keywords = keywordParser.readKeywords();
 
 class Lexer {
 	constructor(fn, text) {
@@ -190,7 +193,7 @@ class Lexer {
 			this.advance();
 		}
 
-		if (Keywords.includes(idStr)) {
+		if (Object.values(keywords).includes(idStr)) {
 			var tokType = Flags.TT_KEYWORD;
 		} else if (Types.includes(idStr)) {
 			var tokType = Flags.TT_TYPE;

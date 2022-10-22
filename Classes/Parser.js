@@ -25,7 +25,10 @@ import VarOperateNode from "./Nodes/VarOperateNode.js";
 import VoidNode from "./Nodes/VoidNode.js";
 import SwitchNode from "./Nodes/SwitchNode.js";
 import ForOfNode from "./Nodes/ForOfNode.js";
+import ParserOptions from "./ParserOptions.js";
 
+const keywordParser = new ParserOptions();
+const keywords = keywordParser.readKeywords();
 class Parser {
 	constructor(tokens) {
 		this.tokens = tokens;
@@ -136,15 +139,15 @@ class Parser {
 			this.advance();
 			return res.success(new TypeNode(null, tok));
 		} else if (
-			tok.matches(Flags.TT_KEYWORD, "true") ||
-			tok.matches(Flags.TT_KEYWORD, "false")
+			tok.matches(Flags.TT_KEYWORD, keywords.true) ||
+			tok.matches(Flags.TT_KEYWORD, keywords.false)
 		) {
 			res.registerAdvancement();
 			this.advance();
 			return res.success(new BooleanNode(tok));
 		} else if (
-			tok.matches(Flags.TT_KEYWORD, "null") ||
-			tok.matches(Flags.TT_KEYWORD, "NaN")
+			tok.matches(Flags.TT_KEYWORD, keywords.null) ||
+			tok.matches(Flags.TT_KEYWORD, keywords.NaN)
 		) {
 			res.registerAdvancement();
 			this.advance();
@@ -225,23 +228,23 @@ class Parser {
 			let objectExpr = res.register(this.objectExpr());
 			if (res.error) return res;
 			return res.success(objectExpr);
-		} else if (tok.matches(Flags.TT_KEYWORD, "if")) {
+		} else if (tok.matches(Flags.TT_KEYWORD, keywords.if)) {
 			let ifExpr = res.register(this.ifExpr());
 			if (res.error) return res;
 			return res.success(ifExpr);
-		} else if (tok.matches(Flags.TT_KEYWORD, "for")) {
+		} else if (tok.matches(Flags.TT_KEYWORD, keywords.for)) {
 			let forExpr = res.register(this.forExpr());
 			if (res.error) return res;
 			return res.success(forExpr);
-		} else if (tok.matches(Flags.TT_KEYWORD, "while")) {
+		} else if (tok.matches(Flags.TT_KEYWORD, keywords.while)) {
 			let whileExpr = res.register(this.whileExpr());
 			if (res.error) return res;
 			return res.success(whileExpr);
-		} else if (tok.matches(Flags.TT_KEYWORD, "switch")) {
+		} else if (tok.matches(Flags.TT_KEYWORD, keywords.switch)) {
 			let switchExpr = res.register(this.switchExpr());
 			if (res.error) return res;
 			return res.success(switchExpr);
-		} else if (tok.matches(Flags.TT_KEYWORD, "func")) {
+		} else if (tok.matches(Flags.TT_KEYWORD, keywords.func)) {
 			let funcDef = res.register(this.funcDef());
 			if (res.error) return res;
 			return res.success(funcDef);
@@ -259,7 +262,7 @@ class Parser {
 	funcDef() {
 		let res = new ParseResult();
 
-		if (!this.currentTok.matches(Flags.TT_KEYWORD, "func")) {
+		if (!this.currentTok.matches(Flags.TT_KEYWORD, keywords.func)) {
 			return res.failure(
 				new Errors.InvalidSyntaxError(
 					this.currentTok.posStart,
@@ -396,7 +399,7 @@ class Parser {
 	switchExpr() {
 		let res = new ParseResult();
 
-		if (!this.currentTok.matches(Flags.TT_KEYWORD, "switch")) {
+		if (!this.currentTok.matches(Flags.TT_KEYWORD, keywords.switch)) {
 			return res.failure(
 				new Errors.InvalidSyntaxError(
 					this.currentTok.posStart,
@@ -442,11 +445,11 @@ class Parser {
 				this.advance();
 			}
 
-			if (this.currentTok.matches(Flags.TT_KEYWORD, "case")) {
+			if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.case)) {
 				let caseExpr = res.register(this.caseExpr());
 				if (res.error) return res;
 				caseNodes.push(caseExpr);
-			} else if (this.currentTok.matches(Flags.TT_KEYWORD, "default")) {
+			} else if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.default)) {
 				res.registerAdvancement();
 				this.advance();
 
@@ -530,7 +533,7 @@ class Parser {
 		let res = new ParseResult();
 		let shouldReturnNull = true;
 
-		if (!this.currentTok.matches(Flags.TT_KEYWORD, "case")) {
+		if (!this.currentTok.matches(Flags.TT_KEYWORD, keywords.case)) {
 			return res.failure(
 				new Errors.InvalidSyntaxError(
 					this.currentTok.posStart,
@@ -792,7 +795,7 @@ class Parser {
 	forExpr() {
 		let res = new ParseResult();
 
-		if (!this.currentTok.matches(Flags.TT_KEYWORD, "for")) {
+		if (!this.currentTok.matches(Flags.TT_KEYWORD, keywords.for)) {
 			return res.failure(
 				new Errors.InvalidSyntaxError(
 					this.currentTok.posStart,
@@ -832,7 +835,7 @@ class Parser {
 		res.registerAdvancement();
 		this.advance();
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "each")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.each)) {
 			res.registerAdvancement();
 			this.advance();
 
@@ -886,14 +889,14 @@ class Parser {
 			let startValue = res.register(this.expr());
 			if (res.error) return res;
 
-			if (this.currentTok.matches(Flags.TT_KEYWORD, "to")) {
+			if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.to)) {
 				res.registerAdvancement();
 				this.advance();
 
 				let endValue = res.register(this.expr());
 				if (res.error) return res;
 
-				if (this.currentTok.matches(Flags.TT_KEYWORD, "inc")) {
+				if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.inc)) {
 					res.registerAdvancement();
 					this.advance();
 
@@ -965,7 +968,7 @@ class Parser {
 	whileExpr() {
 		let res = new ParseResult();
 
-		if (!this.currentTok.matches(Flags.TT_KEYWORD, "while")) {
+		if (!this.currentTok.matches(Flags.TT_KEYWORD, keywords.while)) {
 			return res.failure(
 				new Errors.InvalidSyntaxError(
 					this.currentTok.posStart,
@@ -1053,7 +1056,7 @@ class Parser {
 		let res = new ParseResult();
 		let elseCase = null;
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "else")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.else)) {
 			res.registerAdvancement();
 			this.advance();
 
@@ -1097,7 +1100,7 @@ class Parser {
 		let cases = [];
 		let elseCase = null;
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "elif")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.elif)) {
 			let allCases = res.register(this.ifExprB());
 			if (res.error) return res;
 			[cases, elseCase] = allCases;
@@ -1305,7 +1308,7 @@ class Parser {
 		let res = new ParseResult();
 		let posStart = this.currentTok.posStart.copy();
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "return")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.return)) {
 			res.registerAdvancement();
 			this.advance();
 
@@ -1317,7 +1320,7 @@ class Parser {
 			);
 		}
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "continue")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.continue)) {
 			res.registerAdvancement();
 			this.advance();
 			return res.success(
@@ -1325,7 +1328,7 @@ class Parser {
 			);
 		}
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "break")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.break)) {
 			res.registerAdvancement();
 			this.advance();
 			return res.success(
@@ -1350,7 +1353,7 @@ class Parser {
 	expr() {
 		let res = new ParseResult();
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "set")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.set)) {
 			res.registerAdvancement();
 			this.advance();
 
@@ -1386,7 +1389,7 @@ class Parser {
 			return res.success(new VarAssignNode(varName, expr, false));
 		}
 
-		if (this.currentTok.matches(Flags.TT_KEYWORD, "type")) {
+		if (this.currentTok.matches(Flags.TT_KEYWORD, keywords.type)) {
 			res.registerAdvancement();
 			this.advance();
 
