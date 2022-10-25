@@ -182,12 +182,12 @@ class Http {
 	}
 
 	value_static(app) {
-		BuiltInFunction.prototype.args_cors = ["dir"];
-		BuiltInFunction.prototype.execute_cors = function (execCtx) {
+		BuiltInFunction.prototype.args_static = ["dir"];
+		BuiltInFunction.prototype.execute_static = function (execCtx) {
 			let dir = execCtx.symbolTable.get("dir");
 
 			app.use(
-				express.static(path.join(__dirname, process.argv[2], dir), {
+				express.static(path.join(__dirname, process.argv[2], dir.value), {
 					extensions: ["html"],
 				})
 			);

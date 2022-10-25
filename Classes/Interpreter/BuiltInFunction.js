@@ -260,9 +260,29 @@ class BuiltInFunction extends BaseFunction {
 				.split("/")
 				.slice(0, -1)
 				.join("/");
-			let file = path.join(__dirname, "../../", rootDir, fn.value);
-			if (!fs.existsSync(file))
-				file = path.join(__dirname, "../../", rootDir, fn.value + ".csc");
+
+			let file = path.join(__dirname, "../../", process.argv[2], fn.value);
+
+			console.log(file);
+
+			if (!fs.existsSync(file)) {
+				file = path.join(
+					__dirname,
+					"../../",
+					process.argv[2],
+					fn.value + ".csc"
+				);
+			}
+
+			if (!fs.existsSync(file)) {
+				file = path.join(
+					__dirname,
+					"../../",
+					process.argv[2],
+					fn.value,
+					"index.csc"
+				);
+			}
 
 			try {
 				const script = fs.readFileSync(file, "utf-8");

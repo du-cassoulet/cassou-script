@@ -38,7 +38,9 @@ class Object extends Value {
 					return (
 						"  " +
 						tab +
-						e.elements[0].toString() +
+						"'".green +
+						e.elements[0].toString().green +
+						"'".green +
 						": ".gray +
 						e.elements[1].toString(tabNum + 2)
 					);

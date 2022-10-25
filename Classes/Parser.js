@@ -161,10 +161,10 @@ class Parser {
 				res.registerAdvancement();
 				this.advance();
 
-				let expr = res.register(this.expr());
+				let atom = res.register(this.atom());
 				if (res.error) return res;
 
-				path.push(expr);
+				path.push(atom);
 			}
 
 			if (this.currentTok.type === Flags.TT_EQ) {
@@ -191,7 +191,7 @@ class Parser {
 
 				let expr = res.register(this.expr());
 				if (res.error) return res;
-				return res.success(new VarOperateNode(tok, operatorTok, expr));
+				return res.success(new VarOperateNode(tok, path, operatorTok, expr));
 			}
 
 			return res.success(new VarAccessNode(tok, path));

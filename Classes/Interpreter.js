@@ -131,8 +131,7 @@ class Interpreter {
 
 		for (let i in node.varPathTok) {
 			i = parseInt(i);
-			let e = this.visit(node.varPathTok[i], context);
-			e = e.value;
+			let { value: e } = this.visit(node.varPathTok[i], context);
 
 			if (value instanceof Object) {
 				if (e instanceof Number) {
@@ -146,10 +145,8 @@ class Interpreter {
 					);
 				}
 
-				value = value.elements.find((x) => x.elements[0].value === e.value)
+				value = value.elements.find((x) => x.elements[0] === e.value)
 					.elements[1];
-			} else if (value instanceof String) {
-				value = new String(value.value[e.value]);
 			} else if (value instanceof List) {
 				if (e instanceof String) {
 					return res.failure(
@@ -194,50 +191,36 @@ class Interpreter {
 	visit_VarOperateNode(node, context) {
 		let res = new RTResult();
 		let varName = node.varNameTok.value;
-		let symbolTable = context.symbolTable;
-		let varValue = symbolTable.get(varName);
+		let varValue = context.symbolTable.get(varName);
 
 		let value = res.register(this.visit(node.newValueNode, context));
 		if (res.shouldReturn()) return res;
 
 		let result, error;
 
-		if (node.operatorTok.type === Flags.TT_PLE) {
-			[result, error] = varValue.addedTo(value);
-		} else if (node.operatorTok.type === Flags.TT_MIE) {
-			[result, error] = varValue.subbedBy(value);
-		} else if (node.operatorTok.type === Flags.TT_MUE) {
-			[result, error] = varValue.multedBy(value);
-		} else if (node.operatorTok.type === Flags.TT_DIE) {
-			[result, error] = varValue.divedBy(value);
+		function getResult(val1, val2) {
+			if (node.operatorTok.type === Flags.TT_PLE) {
+				return val1.addedTo(val2);
+			} else if (node.operatorTok.type === Flags.TT_MIE) {
+				return val1.subbedBy(val2);
+			} else if (node.operatorTok.type === Flags.TT_MUE) {
+				return val1.multedBy(val2);
+			} else if (node.operatorTok.type === Flags.TT_DIE) {
+				return val1.divedBy(val2);
+			}
 		}
 
-		symbolTable.set(varName, result);
-
-		if (error) {
-			return res.failure(error);
-		} else {
-			return res.success(result.setPos(node.posStart, node.posEnd));
-		}
-	}
-
-	visit_VarReAssignNode(node, context) {
-		let res = new RTResult();
-		let varName = node.varNameTok.value;
-		let value = res.register(this.visit(node.newValueNode, context));
-		if (res.error) return res;
-
-		const setValue = () => {
-			if (!node.varPathTok.length) {
-				context.symbolTable.set(varName, value);
+		if (context.symbolTable.get(varName)) {
+			if (node.varPathTok.length < 1) {
+				[result, error] = getResult(varValue, value);
+				context.symbolTable.set(varName, result);
 			} else {
 				let baseNode = context.symbolTable.get(varName);
 				let newNode = baseNode;
 
 				for (let i in node.varPathTok) {
 					i = parseInt(i);
-					let e = this.visit(node.varPathTok[i], context);
-					e = e.value;
+					let { value: e } = this.visit(node.varPathTok[i], context);
 
 					if (newNode instanceof Object) {
 						if (e instanceof Number) {
@@ -252,7 +235,103 @@ class Interpreter {
 						}
 
 						let ei = newNode.elements.findIndex(
-							(x) => x.elements[0] === e.value
+							(x) => x.elements[0].value === e.value
+						);
+
+						if (ei + 1 === 0) {
+							return res.failure(
+								new Errors.RTError(
+									node.posStart,
+									node.posEnd,
+									"Invalid assignment"
+								)
+							);
+						} else {
+							if (i + 1 === node.varPathTok.length) {
+								[result, error] = getResult(
+									newNode.elements[ei].elements[1],
+									value
+								);
+
+								newNode.elements[ei].elements[1] = result;
+							} else {
+								newNode = newNode.elements[ei].elements[1];
+							}
+						}
+					} else if (newNode instanceof List) {
+						if (e instanceof String) {
+							return res.failure(
+								new Errors.RTError(
+									node.posStart,
+									node.posEnd,
+									`You can't use a string to index a list.`,
+									context
+								)
+							);
+						}
+
+						if (i + 1 === node.varPathTok.length) {
+							if (e.value > newNode.elements.length) {
+								return res.failure(
+									new Errors.IllegalCharError(
+										node.posStart,
+										node.posEnd,
+										`Invalid index '${e.value}' in list`
+									)
+								);
+							}
+
+							[result, error] = getResult(newNode.elements[e.value], value);
+
+							newNode.elements[e.value] = result;
+						} else {
+							newNode = newNode.elements[e.value];
+						}
+					}
+				}
+
+				context.symbolTable.set(varName, baseNode);
+			}
+		}
+
+		if (error) {
+			return res.failure(error);
+		} else {
+			return res.success(result.setPos(node.posStart, node.posEnd));
+		}
+	}
+
+	visit_VarReAssignNode(node, context) {
+		let res = new RTResult();
+		let varName = node.varNameTok.value;
+		let value = res.register(this.visit(node.newValueNode, context));
+		if (res.error) return res;
+
+		if (context.symbolTable.get(varName)) {
+			if (!node.varPathTok.length) {
+				context.symbolTable.set(varName, value);
+			} else {
+				let baseNode = context.symbolTable.get(varName);
+				let newNode = baseNode;
+
+				for (let i in node.varPathTok) {
+					i = parseInt(i);
+					let { value: e } = this.visit(node.varPathTok[i], context);
+
+					if (newNode instanceof Object) {
+						if (e instanceof Number) {
+							return res.failure(
+								new Errors.RTError(
+									node.posStart,
+									node.posEnd,
+									`You can't use a number to index an object.`,
+									context
+								)
+							);
+						}
+
+						let ei = newNode.elements.findIndex(
+							(x) => x.elements[0].value === e.value
 						);
 
 						if (ei + 1 === 0) {
@@ -310,10 +389,6 @@ class Interpreter {
 
 				context.symbolTable.set(varName, baseNode);
 			}
-		};
-
-		if (context.symbolTable.get(varName)) {
-			setValue();
 		}
 
 		if (res.error) return res;
@@ -574,6 +649,10 @@ class Interpreter {
 		if (res.shouldReturn()) return res;
 		valueToCall = valueToCall.copy().setPos(node.posStart, node.posEnd);
 
+		if (valueToCall instanceof String) {
+			// console.log(node);
+		}
+
 		for (const argNode of node.argNodes) {
 			args.push(res.register(this.visit(argNode, context)));
 			if (res.shouldReturn()) return res;
@@ -581,10 +660,12 @@ class Interpreter {
 
 		let returnValue = res.register(valueToCall.execute(args));
 		if (res.shouldReturn()) return res;
+
 		returnValue = returnValue
 			.copy()
 			.setPos(node.posStart, node.posEnd)
 			.setContext(context);
+
 		return res.success(returnValue);
 	}
 
