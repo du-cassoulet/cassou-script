@@ -85,8 +85,12 @@ class String extends Value {
 		return copy;
 	}
 
-	toString() {
-		return `'${this.value}'`.green;
+	toString(tabNum) {
+		if (!tabNum) {
+			return this.value.toString();
+		} else {
+			return `'${this.value}'`.green;
+		}
 	}
 }
 

@@ -161,30 +161,24 @@ class Parser {
 				res.registerAdvancement();
 				this.advance();
 
-				if (
-					[Flags.TT_STRING, Flags.TT_INT, Flags.TT_IDENTIFIER].includes(
-						this.currentTok.type
-					)
-				) {
-					path.push(this.currentTok);
-					res.registerAdvancement();
-					this.advance();
-				} else {
-					return res.failure(
-						new Errors.ExpectedCharError(
-							this.currentTok.posStart,
-							this.currentTok.posEnd,
-							"Expected a string or an int"
-						)
-					);
-				}
+				let expr = res.register(this.expr());
+				if (res.error) return res;
+
+				path.push(expr);
 			}
 
 			if (this.currentTok.type === Flags.TT_EQ) {
 				res.registerAdvancement();
 				this.advance();
+
+				while (this.currentTok.type === Flags.TT_NEWLINE) {
+					res.registerAdvancement();
+					this.advance();
+				}
+
 				let expr = res.register(this.expr());
 				if (res.error) return res;
+
 				return res.success(new VarReAssignNode(tok, path, expr));
 			} else if (
 				[Flags.TT_PLE, Flags.TT_MIE, Flags.TT_MUE, Flags.TT_DIE].includes(
@@ -681,22 +675,8 @@ class Parser {
 			this.advance();
 		}
 
-		if (
-			this.currentTok.type !== Flags.TT_STRING &&
-			this.currentTok.type !== Flags.TT_IDENTIFIER
-		) {
-			return res.failure(
-				new Errors.InvalidSyntaxError(
-					this.currentTok.posStart,
-					this.currentTok.posEnd,
-					"Expected string or identifier"
-				)
-			);
-		}
-
-		const key = this.currentTok;
-		res.registerAdvancement();
-		this.advance();
+		let key = res.register(this.expr());
+		if (res.error) return res;
 
 		while (this.currentTok.type === Flags.TT_NEWLINE) {
 			res.registerAdvancement();
@@ -859,9 +839,6 @@ class Parser {
 				let body = res.register(this.statement());
 				if (res.error) return res;
 
-				res.registerAdvancement();
-				this.advance();
-
 				return res.success(new ForOfNode(varName, browseValue, body, false));
 			} else if (this.currentTok.type === Flags.TT_LBRACKET) {
 				res.registerAdvancement();
@@ -922,9 +899,6 @@ class Parser {
 
 					let body = res.register(this.statement());
 					if (res.error) return res;
-
-					res.registerAdvancement();
-					this.advance();
 
 					return res.success(
 						new ForInNode(varName, startValue, endValue, stepValue, body, false)
@@ -1371,6 +1345,11 @@ class Parser {
 			res.registerAdvancement();
 			this.advance();
 
+			while (this.currentTok.type === Flags.TT_NEWLINE) {
+				res.registerAdvancement();
+				this.advance();
+			}
+
 			if (this.currentTok.type !== Flags.TT_EQ) {
 				return res.failure(
 					new Errors.InvalidSyntaxError(
@@ -1383,6 +1362,11 @@ class Parser {
 
 			res.registerAdvancement();
 			this.advance();
+
+			while (this.currentTok.type === Flags.TT_NEWLINE) {
+				res.registerAdvancement();
+				this.advance();
+			}
 
 			let expr = res.register(this.expr());
 			if (res.error) return res;

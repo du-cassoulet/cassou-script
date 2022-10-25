@@ -2,6 +2,7 @@ import Errors from "../Errors.js";
 import Value from "./Value.js";
 import List from "./List.js";
 import Boolean from "./Boolean.js";
+import String from "./String.js";
 
 class Number extends Value {
 	static pi = new Number(Math.PI);
@@ -15,6 +16,12 @@ class Number extends Value {
 		if (other instanceof Number) {
 			return [
 				new Number(this.value + other.value).setContext(this.context),
+				null,
+			];
+		}
+		if (other instanceof String) {
+			return [
+				new String(this.value + other.value).setContext(this.context),
 				null,
 			];
 		} else {

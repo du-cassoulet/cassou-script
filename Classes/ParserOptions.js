@@ -19,10 +19,10 @@ class ParserOptions {
 			data[keyword] = keyword;
 		}
 
-		console.log(this.configPath);
-
 		if (fs.existsSync(this.configPath)) {
 			const configTxt = fs.readFileSync(this.configPath, "utf-8");
+
+			if (configTxt === "") return data;
 
 			for (const line of configTxt.split(/\r?\n/)) {
 				if (line.startsWith(">>")) continue;

@@ -90,9 +90,17 @@ class Interpreter {
 
 	visit_EntryNode(node, context) {
 		let res = new RTResult();
-		let keyName = node.keyTok;
-		while (keyName.type === Flags.TT_IDENTIFIER) {
-			keyName = context.symbolTable.get(keyName.value);
+		let keyName = this.visit(node.keyTok);
+
+		if (keyName.value instanceof Number) {
+			return res.failure(
+				new Errors.RTError(
+					node.posStart,
+					node.posEnd,
+					`The key is not a string`,
+					context
+				)
+			);
 		}
 
 		let value = res.register(this.visit(node.valueNode, context));
@@ -123,18 +131,38 @@ class Interpreter {
 
 		for (let i in node.varPathTok) {
 			i = parseInt(i);
-			let e = node.varPathTok[i];
-			while (e.type === Flags.TT_IDENTIFIER) {
-				e = context.symbolTable.get(e.value);
-			}
+			let e = this.visit(node.varPathTok[i], context);
 			e = e.value;
 
 			if (value instanceof Object) {
-				value = value.elements.find((x) => x.elements[0] === e).elements[1];
+				if (e instanceof Number) {
+					return res.failure(
+						new Errors.RTError(
+							node.posStart,
+							node.posEnd,
+							`You can't use a number to index an object.`,
+							context
+						)
+					);
+				}
+
+				value = value.elements.find((x) => x.elements[0].value === e.value)
+					.elements[1];
 			} else if (value instanceof String) {
-				value = new String(value.value[e]);
+				value = new String(value.value[e.value]);
 			} else if (value instanceof List) {
-				value = value.elements[e];
+				if (e instanceof String) {
+					return res.failure(
+						new Errors.RTError(
+							node.posStart,
+							node.posEnd,
+							`You can't use a string to index a list.`,
+							context
+						)
+					);
+				}
+
+				value = value.elements[e.value];
 			}
 		}
 
@@ -208,18 +236,29 @@ class Interpreter {
 
 				for (let i in node.varPathTok) {
 					i = parseInt(i);
-					let e = node.varPathTok[i];
-					while (e.type === Flags.TT_IDENTIFIER) {
-						e = context.symbolTable.get(e.value);
-					}
+					let e = this.visit(node.varPathTok[i], context);
 					e = e.value;
+
 					if (newNode instanceof Object) {
-						let ei = newNode.elements.findIndex((x) => x.elements[0] === e);
+						if (e instanceof Number) {
+							return res.failure(
+								new Errors.RTError(
+									node.posStart,
+									node.posEnd,
+									`You can't use a number to index an object.`,
+									context
+								)
+							);
+						}
+
+						let ei = newNode.elements.findIndex(
+							(x) => x.elements[0] === e.value
+						);
 
 						if (ei + 1 === 0) {
 							if (i + 1 === node.varPathTok.length) {
 								newNode.elements.push(
-									new List([e, value])
+									new List([e.value, value])
 										.setContext(context)
 										.setPos(node.posStart, node.posEnd)
 								);
@@ -240,33 +279,31 @@ class Interpreter {
 							}
 						}
 					} else if (newNode instanceof List) {
-						if (e + 1 === 0) {
-							if (i + 1 === node.varPathTok.length) {
-								newNode.elements.push(value);
-							} else {
+						if (e instanceof String) {
+							return res.failure(
+								new Errors.RTError(
+									node.posStart,
+									node.posEnd,
+									`You can't use a string to index a list.`,
+									context
+								)
+							);
+						}
+
+						if (i + 1 === node.varPathTok.length) {
+							if (e.value > newNode.elements.length) {
 								return res.failure(
-									new Errors.RTError(
+									new Errors.IllegalCharError(
 										node.posStart,
 										node.posEnd,
-										"Invalid assignment"
+										`Invalid index '${e.value}' in list`
 									)
 								);
 							}
+
+							newNode.elements[e.value] = value;
 						} else {
-							if (i + 1 === node.varPathTok.length) {
-								newNode.elements[e] = value;
-							} else {
-								if (!newNode.elements[e]) {
-									return res.failure(
-										new Errors.IllegalCharError(
-											node.posStart,
-											node.posEnd,
-											`Invalid index '${e}' in list`
-										)
-									);
-								}
-								newNode = newNode.elements[e];
-							}
+							newNode = newNode.elements[e.value];
 						}
 					}
 				}

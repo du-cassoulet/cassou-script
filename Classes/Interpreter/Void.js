@@ -18,7 +18,7 @@ class Void extends Value {
 	}
 
 	toString() {
-		return `${this.value}`.red;
+		return `${this.value}`.gray;
 	}
 }
 

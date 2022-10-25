@@ -7,7 +7,12 @@ import RTResult from "../../RTResult.js";
 import PromiseClass from "../Promise.js";
 import Void from "../Void.js";
 import Converter from "../../Converter.js";
+import { fileURLToPath } from "url";
+import path from "path";
 
+const __dirname = path.dirname(
+	path.join(fileURLToPath(import.meta.url), "../../../")
+);
 class Http {
 	constructor() {
 		this.name = "csc-http";
@@ -176,6 +181,21 @@ class Http {
 		};
 	}
 
+	value_static(app) {
+		BuiltInFunction.prototype.args_cors = ["dir"];
+		BuiltInFunction.prototype.execute_cors = function (execCtx) {
+			let dir = execCtx.symbolTable.get("dir");
+
+			app.use(
+				express.static(path.join(__dirname, process.argv[2], dir), {
+					extensions: ["html"],
+				})
+			);
+
+			return new RTResult().success(new Void(null));
+		};
+	}
+
 	run() {
 		const app = express();
 
@@ -188,6 +208,7 @@ class Http {
 		this.value_patch(app);
 		this.value_delete(app);
 		this.value_cors(app);
+		this.value_static(app);
 
 		return new Object([
 			new List(["listen", new BuiltInFunction("listen")]),
@@ -199,6 +220,7 @@ class Http {
 			new List(["patch", new BuiltInFunction("patch")]),
 			new List(["delete", new BuiltInFunction("delete")]),
 			new List(["cors", new BuiltInFunction("cors")]),
+			new List(["static", new BuiltInFunction("static")]),
 		]);
 	}
 }

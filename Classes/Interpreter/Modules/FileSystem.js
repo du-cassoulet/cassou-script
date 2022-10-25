@@ -8,7 +8,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import String from "../String.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(
+	path.join(fileURLToPath(import.meta.url), "../../../")
+);
 
 class FileSystem {
 	constructor() {
@@ -27,7 +29,7 @@ class FileSystem {
 			const encodage = execCtx.symbolTable.get("encodage");
 
 			fs.writeFileSync(
-				path.join(__dirname, "../../../scripts", fileName.value),
+				path.join(__dirname, process.argv[2], fileName.value),
 				value.value,
 				encodage.value
 			);
@@ -42,7 +44,7 @@ class FileSystem {
 			const encodage = execCtx.symbolTable.get("encodage");
 
 			const value = fs.readFileSync(
-				path.join(__dirname, "../../../scripts", fileName.value),
+				path.join(__dirname, process.argv[2], fileName.value),
 				encodage.value
 			);
 			return new RTResult().success(new String(value));

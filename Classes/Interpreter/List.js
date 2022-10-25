@@ -66,6 +66,9 @@ class List extends Value {
 	toString(tabNum = 0) {
 		let tab = "";
 		for (let i = 0; i < tabNum; i++) tab += " ";
+
+		if (this.elements.length === 0) return "[]".gray;
+
 		return (
 			"[".gray +
 			"\n" +

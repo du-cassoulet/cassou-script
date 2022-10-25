@@ -25,7 +25,7 @@ if (
 	code = fs.readFileSync(path.join(__dirname, file, "index.csc"), "utf-8");
 }
 
-if (!code) throw new Error("Invalid file");
+if (!code && code !== "") throw new Error("Invalid file");
 let [_, error] = run(file, code);
 
 if (error) {
