@@ -3,6 +3,9 @@ import Value from "./Value.js";
 class Type extends Value {
 	static pi = new Number(Math.PI);
 
+	/**
+	 * @param {string} value
+	 */
 	constructor(value) {
 		super();
 		this.value = value;

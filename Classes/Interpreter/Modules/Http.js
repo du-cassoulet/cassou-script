@@ -18,6 +18,9 @@ class Http {
 		this.name = "csc-http";
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_listen(app) {
 		BuiltInFunction.prototype.args_listen = ["port"];
 		BuiltInFunction.prototype.execute_listen = function (execCtx) {
@@ -33,6 +36,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_format(app) {
 		BuiltInFunction.prototype.args_format = ["format"];
 		BuiltInFunction.prototype.execute_format = function (execCtx) {
@@ -43,6 +49,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_urlencoded(app) {
 		BuiltInFunction.prototype.args_urlencoded = ["options"];
 		BuiltInFunction.prototype.execute_urlencoded = function (execCtx) {
@@ -54,6 +63,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_get(app) {
 		BuiltInFunction.prototype.args_get = ["path", "callback"];
 		BuiltInFunction.prototype.execute_get = function (execCtx) {
@@ -77,6 +89,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_post(app) {
 		BuiltInFunction.prototype.args_post = ["path", "callback"];
 		BuiltInFunction.prototype.execute_post = function (execCtx) {
@@ -100,6 +115,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_put(app) {
 		BuiltInFunction.prototype.args_put = ["path", "callback"];
 		BuiltInFunction.prototype.execute_put = function (execCtx) {
@@ -123,6 +141,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_patch(app) {
 		BuiltInFunction.prototype.args_patch = ["path", "callback"];
 		BuiltInFunction.prototype.execute_patch = function (execCtx) {
@@ -146,6 +167,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_delete(app) {
 		BuiltInFunction.prototype.args_delete = ["path", "callback"];
 		BuiltInFunction.prototype.execute_delete = function (execCtx) {
@@ -169,6 +193,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_cors(app) {
 		BuiltInFunction.prototype.args_cors = ["options"];
 		BuiltInFunction.prototype.execute_cors = function (execCtx) {
@@ -181,6 +208,9 @@ class Http {
 		};
 	}
 
+	/**
+	 * @param {express.Application} app
+	 */
 	value_static(app) {
 		BuiltInFunction.prototype.args_static = ["dir"];
 		BuiltInFunction.prototype.execute_static = function (execCtx) {

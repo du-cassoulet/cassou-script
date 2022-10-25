@@ -2,6 +2,9 @@ import List from "./List.js";
 import Value from "./Value.js";
 
 class Object extends Value {
+	/**
+	 * @param {List[]} elements
+	 */
 	constructor(elements) {
 		super();
 		this.elements = elements;
@@ -14,6 +17,10 @@ class Object extends Value {
 		return copy;
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	addedTo(other) {
 		if (other instanceof Object) {
 			return [new Object([...this.elements, ...other.elements]), null];
@@ -22,6 +29,10 @@ class Object extends Value {
 		}
 	}
 
+	/**
+	 * @param {number} tabNum
+	 * @returns {string}
+	 */
 	toString(tabNum = 0) {
 		let tab = "";
 		for (let i = 0; i < tabNum; i++) tab += " ";

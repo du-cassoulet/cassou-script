@@ -10,6 +10,11 @@ class Converter {
 		this.traversedProps = new Set();
 	}
 
+	/**
+	 * Translates any values to a node object.
+	 * @param {any} value
+	 * @returns {any}
+	 */
 	valueToNode(value) {
 		switch (typeof value) {
 			case "string":
@@ -29,6 +34,11 @@ class Converter {
 		}
 	}
 
+	/**
+	 * Translates any JSON values to a node object.
+	 * @param {any} json
+	 * @returns {any}
+	 */
 	JSONToNodes(json) {
 		let elements = [];
 		if (this.traversedProps.has(json)) return new List([]);
@@ -61,7 +71,7 @@ class Converter {
 
 			var obj = new List(elements);
 		} else {
-			if (json)
+			if (json) {
 				Object.entries(json).forEach(([key, value]) => {
 					switch (typeof value) {
 						case "string":
@@ -84,6 +94,7 @@ class Converter {
 							elements.push(new List([key, new Void(null)]));
 					}
 				});
+			}
 
 			var obj = new ObjClass(elements);
 		}
@@ -91,6 +102,11 @@ class Converter {
 		return obj;
 	}
 
+	/**
+	 * Translates any node to a JSON object.
+	 * @param {any} node
+	 * @returns {any}
+	 */
 	nodeToValue(node) {
 		if (node === undefined) return undefined;
 

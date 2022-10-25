@@ -1,5 +1,14 @@
-class TypeNode {
+import Token from "../Token.js";
+import BaseNode from "./BaseNode.js";
+
+class TypeNode extends BaseNode {
+	/**
+	 * @param {BaseNode} nodeElement
+	 * @param {Token} typeTok
+	 */
 	constructor(nodeElement, typeTok) {
+		super();
+
 		this.nodeElement = nodeElement;
 		this.typeTok = typeTok;
 
@@ -10,10 +19,6 @@ class TypeNode {
 			this.posStart = this.typeTok.posStart;
 			this.posEnd = this.typeTok.posEnd;
 		}
-	}
-
-	toString() {
-		return `${this.nodeElement}`;
 	}
 }
 

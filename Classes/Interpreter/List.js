@@ -56,6 +56,10 @@ class List extends Value {
 		}
 	}
 
+	isTrue() {
+		return this.elements.length > 0;
+	}
+
 	copy() {
 		let copy = new List([...this.elements]);
 		copy.setPos(this.posStart, this.posEnd);
@@ -63,6 +67,10 @@ class List extends Value {
 		return copy;
 	}
 
+	/**
+	 * @param {number} tabNum
+	 * @returns {string}
+	 */
 	toString(tabNum = 0) {
 		let tab = "";
 		for (let i = 0; i < tabNum; i++) tab += " ";

@@ -1,5 +1,16 @@
-class FuncDefNode {
+import Token from "../Token.js";
+import BaseNode from "./BaseNode.js";
+
+class FuncDefNode extends BaseNode {
+	/**
+	 * @param {Token} varNameTok
+	 * @param {Token[]} argNameToks
+	 * @param {BaseNode} bodyNode
+	 * @param {boolean} shouldAutoReturn
+	 */
 	constructor(varNameTok, argNameToks, bodyNode, shouldAutoReturn) {
+		super();
+
 		this.varNameTok = varNameTok;
 		this.argNameToks = argNameToks;
 		this.bodyNode = bodyNode;

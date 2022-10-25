@@ -1,16 +1,29 @@
 import Interpreter from "../Interpreter.js";
+import BaseNode from "../Nodes/BaseNode.js";
 import RTResult from "../RTResult.js";
 import BaseFunction from "./BaseFunction.js";
+import Value from "./Value.js";
 import Void from "./Void.js";
 
 class Function extends BaseFunction {
+	/**
+	 * @param {string} name
+	 * @param {BaseNode} bodyNode
+	 * @param {string[]} argNames
+	 * @param {boolean} shouldAutoReturn
+	 */
 	constructor(name, bodyNode, argNames, shouldAutoReturn) {
 		super(name);
+
 		this.bodyNode = bodyNode;
 		this.argNames = argNames;
 		this.shouldAutoReturn = shouldAutoReturn;
 	}
 
+	/**
+	 * @param {Value} args
+	 * @returns {RTResult}
+	 */
 	execute(args) {
 		let res = new RTResult();
 		let interpreter = new Interpreter();
@@ -26,6 +39,7 @@ class Function extends BaseFunction {
 			(this.shouldAutoReturn ? value : null) ||
 			res.funcReturnValue ||
 			new Void(null);
+
 		return res.success(retValue);
 	}
 

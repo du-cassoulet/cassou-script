@@ -1,3 +1,11 @@
+import Position from "./Classes/Position.js";
+
+/**
+ * @param {any} obj
+ * @param {string} prop
+ * @param {Function} defaultValue
+ * @returns {any}
+ */
 export function getattr(obj, prop, defaultValue = null) {
 	if (prop in obj) {
 		let val = obj[prop];
@@ -10,6 +18,13 @@ export function getattr(obj, prop, defaultValue = null) {
 	throw new TypeError(`"${obj}" object has no attribute "${prop}"`);
 }
 
+/**
+ * Display an error message with arrows pointing to the error.
+ * @param {string} text
+ * @param {Position} posStart
+ * @param {Position} posEnd
+ * @returns {string}
+ */
 export function stringWithArrows(text, posStart, posEnd) {
 	let result = "";
 	let idxStart = Math.max(text.lastIndexOf("\n", posStart.idx), 0);

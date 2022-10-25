@@ -1,6 +1,9 @@
 import Value from "./Value.js";
 
 class Void extends Value {
+	/**
+	 * @param {void} value
+	 */
 	constructor(value) {
 		super();
 		this.value = value;

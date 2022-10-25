@@ -10,6 +10,11 @@ const keywordParser = new ParserOptions();
 const keywords = keywordParser.readKeywords();
 
 class Lexer {
+	/**
+	 * To convert human-written code to computer-readable Nodes.
+	 * @param {string} fn
+	 * @param {string} text
+	 */
 	constructor(fn, text) {
 		this.fn = fn;
 		this.text = text;
@@ -99,6 +104,7 @@ class Lexer {
 			} else {
 				let posStart = this.pos.copy();
 				let char = this.currentChar;
+
 				this.advance();
 				return [
 					[],
@@ -111,11 +117,17 @@ class Lexer {
 		return [tokens, null];
 	}
 
+	/**
+	 * To make a number from a string.
+	 * @param {Token[]} tokens
+	 * @returns {Token}
+	 */
 	makeNumber(tokens) {
 		let lastTok = tokens[tokens.length - 1];
 		let numStr = "";
 		let dotCount = 0;
 		let posStart = this.pos.copy();
+
 		if (lastTok.type === Flags.TT_DOT) {
 			while (
 				this.currentChar !== null &&

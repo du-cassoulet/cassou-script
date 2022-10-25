@@ -4,11 +4,18 @@ import List from "./List.js";
 import Boolean from "./Boolean.js";
 
 class String extends Value {
+	/**
+	 * @param {string} value
+	 */
 	constructor(value) {
 		super();
 		this.value = value;
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	addedTo(other) {
 		if (other instanceof String) {
 			return [
@@ -27,6 +34,10 @@ class String extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	multedBy(other) {
 		if (other instanceof Number) {
 			return [
@@ -38,6 +49,10 @@ class String extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonEq(other) {
 		if (other instanceof String) {
 			return [
@@ -49,6 +64,10 @@ class String extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonNe(other) {
 		if (other instanceof String) {
 			return [
@@ -60,6 +79,10 @@ class String extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	isIn(other) {
 		if (other instanceof List) {
 			let includes = !!other.elements.find(

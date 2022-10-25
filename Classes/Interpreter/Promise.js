@@ -1,14 +1,16 @@
 import Value from "./Value.js";
 
 class Promise extends Value {
-	constructor(value, id) {
+	/**
+	 * @param {Promise} value
+	 */
+	constructor(value) {
 		super();
 		this.value = value;
-		this.id = id;
 	}
 
 	copy() {
-		let copy = new Promise(this.value, this.id);
+		let copy = new Promise(this.value);
 		copy.setPos(this.posStart, this.posEnd);
 		copy.setContext(this.context);
 		return copy;

@@ -29,6 +29,11 @@ globalSymbolTable.set("keys", BuiltInFunction.keys);
 globalSymbolTable.set("values", BuiltInFunction.values);
 globalSymbolTable.set("entries", BuiltInFunction.entries);
 
+/**
+ * @param {string} fn
+ * @param {string} text
+ * @returns {[]}
+ */
 export function run(fn, text) {
 	let lexer = new Lexer(fn, text);
 	let [tokens, error] = lexer.makeToken();

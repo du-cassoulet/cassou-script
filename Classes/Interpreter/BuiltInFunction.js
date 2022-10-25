@@ -18,6 +18,7 @@ import PromiseClass from "./Promise.js";
 import Function from "./Function.js";
 import Value from "./Value.js";
 import Modules from "../Modules.js";
+import Context from "../Context.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const prompt = PromptSync({ sigint: true });
@@ -43,8 +44,13 @@ class BuiltInFunction extends BaseFunction {
 	static values = new BuiltInFunction("values");
 	static entries = new BuiltInFunction("entries");
 
+	/**
+	 *
+	 * @param {string} name
+	 */
 	constructor(name) {
 		super(name);
+
 		this.args_log = ["value"];
 		this.args_ask = ["value"];
 		this.args_clear = [];
@@ -66,6 +72,10 @@ class BuiltInFunction extends BaseFunction {
 		this.args_entries = ["object"];
 	}
 
+	/**
+	 * @param {Value} args
+	 * @returns {RTResult}
+	 */
 	execute(args) {
 		let res = new RTResult();
 		let execCtx = this.generateNewContext();
@@ -97,11 +107,19 @@ class BuiltInFunction extends BaseFunction {
 		return `<built-in function ${this.name}>`.cyan;
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_log(execCtx) {
 		console.log(execCtx.symbolTable.get("value").toString());
 		return new RTResult().success(new Void(null));
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_ask(execCtx) {
 		const value = execCtx.symbolTable.get("value");
 
@@ -119,6 +137,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_keys(execCtx) {
 		const object = execCtx.symbolTable.get("object");
 
@@ -137,6 +159,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_values(execCtx) {
 		const object = execCtx.symbolTable.get("object");
 
@@ -155,6 +181,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_entries(execCtx) {
 		const object = execCtx.symbolTable.get("object");
 
@@ -186,6 +216,10 @@ class BuiltInFunction extends BaseFunction {
 		return new RTResult().success(new Number(Math.random()));
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_round(execCtx) {
 		const value = execCtx.symbolTable.get("value");
 
@@ -202,6 +236,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_floor(execCtx) {
 		const value = execCtx.symbolTable.get("value");
 
@@ -218,6 +256,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_ceil(execCtx) {
 		const value = execCtx.symbolTable.get("value");
 
@@ -234,6 +276,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_import(execCtx) {
 		let fn = execCtx.symbolTable.get("fn");
 
@@ -256,14 +302,7 @@ class BuiltInFunction extends BaseFunction {
 			const result = module.run();
 			return new RTResult().success(result);
 		} else {
-			const rootDir = execCtx.parentEntryPos.fn
-				.split("/")
-				.slice(0, -1)
-				.join("/");
-
 			let file = path.join(__dirname, "../../", process.argv[2], fn.value);
-
-			console.log(file);
 
 			if (!fs.existsSync(file)) {
 				file = path.join(
@@ -319,6 +358,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_join(execCtx) {
 		let join = execCtx.symbolTable.get("join");
 		let array = execCtx.symbolTable.get("array");
@@ -350,6 +393,10 @@ class BuiltInFunction extends BaseFunction {
 		);
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_size(execCtx) {
 		let element = execCtx.symbolTable.get("element");
 
@@ -369,6 +416,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_integer(execCtx) {
 		let res = new RTResult();
 		let val = execCtx.symbolTable.get("val");
@@ -380,6 +431,10 @@ class BuiltInFunction extends BaseFunction {
 		return res.success(new Number(parseInt(val.value)));
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_float(execCtx) {
 		let res = new RTResult();
 		let val = execCtx.symbolTable.get("val");
@@ -391,11 +446,19 @@ class BuiltInFunction extends BaseFunction {
 		return res.success(new Number(parseFloat(val.value)));
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	exeute_string(execCtx) {
 		let val = execCtx.symbolTable.get("val");
 		return new RTResult().success(new String(val.value.toString()));
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_fetch(execCtx) {
 		let res = new RTResult();
 		let converter = new Converter();
@@ -435,6 +498,10 @@ class BuiltInFunction extends BaseFunction {
 		);
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_waitfor(execCtx) {
 		let res = new RTResult();
 		let promises = execCtx.symbolTable.get("promises");
@@ -505,6 +572,10 @@ class BuiltInFunction extends BaseFunction {
 		}
 	}
 
+	/**
+	 * @param {Context} execCtx
+	 * @returns {RTResult}
+	 */
 	execute_timeout(execCtx) {
 		let res = new RTResult();
 		let ms = execCtx.symbolTable.get("ms");

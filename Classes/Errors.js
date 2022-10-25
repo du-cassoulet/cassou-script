@@ -1,4 +1,13 @@
+import Position from "./Position.js";
+
 class Error {
+	/**
+	 * The default error parameters
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 * @param {string} errorName
+	 * @param {string} details
+	 */
 	constructor(posStart, posEnd, errorName, details) {
 		this.posStart = posStart;
 		this.posEnd = posEnd;
@@ -15,30 +24,60 @@ class Error {
 }
 
 class IllegalCharError extends Error {
+	/**
+	 * The constructor for the 'Illegal Character Error' Error.
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 * @param {string} details
+	 */
 	constructor(posStart, posEnd, details) {
 		super(posStart, posEnd, "Illegal Character", details);
 	}
 }
 
 class InvalidSyntaxError extends Error {
+	/**
+	 * The constructor for the 'Invalid Syntax' Error.
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 * @param {string} details
+	 */
 	constructor(posStart, posEnd, details) {
 		super(posStart, posEnd, "Invalid Syntax", details);
 	}
 }
 
 class ExpectedCharError extends Error {
+	/**
+	 * The constructor for the 'Expected Character' Error.
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 * @param {string} details
+	 */
 	constructor(posStart, posEnd, details) {
 		super(posStart, posEnd, "Expected Character", details);
 	}
 }
 
 class TypingError extends Error {
+	/**
+	 * The constructor for the 'Typing Error' Error.
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 * @param {string} details
+	 */
 	constructor(posStart, posEnd, details) {
 		super(posStart, posEnd, "Typing Error", details);
 	}
 }
 
 class RTError extends Error {
+	/**
+	 * The constructor for the 'Runtime Error' Error.
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 * @param {string} details
+	 */
 	constructor(posStart, posEnd, details, context) {
 		super(posStart, posEnd, "Runtime Error", details);
 		this.context = context;
@@ -69,6 +108,7 @@ class RTError extends Error {
 }
 
 export default {
+	BaseError: Error,
 	IllegalCharError,
 	InvalidSyntaxError,
 	RTError,

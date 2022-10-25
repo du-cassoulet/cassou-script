@@ -1,4 +1,5 @@
 import Flags from "../Constants/Flags.js";
+import Token from "./Token.js";
 import NumberNode from "./Nodes/NumberNode.js";
 import BinOpNode from "./Nodes/BinOpNode.js";
 import ParseResult from "./ParseResult.js";
@@ -30,6 +31,10 @@ import ParserOptions from "./ParserOptions.js";
 const keywordParser = new ParserOptions();
 const keywords = keywordParser.readKeywords();
 class Parser {
+	/**
+	 * The list of tokens interpreted by the Interpreter.
+	 * @param {Token[]} tokens
+	 */
 	constructor(tokens) {
 		this.tokens = tokens;
 		this.tokIdx = -1;
@@ -43,6 +48,11 @@ class Parser {
 		return this.currentTok;
 	}
 
+	/**
+	 * To reverse the current token.
+	 * @param {number} amount
+	 * @returns {Token}
+	 */
 	reverse(amount = 1) {
 		this.tokIdx -= amount;
 		this.updateCurrentTok();
@@ -406,7 +416,7 @@ class Parser {
 		res.registerAdvancement();
 		this.advance();
 
-		let switchTok = res.register(this.expr());
+		let switchNode = res.register(this.expr());
 		if (res.error) return res;
 
 		if (this.currentTok.type !== Flags.TT_LBRACKET) {
@@ -520,7 +530,7 @@ class Parser {
 		res.registerAdvancement();
 		this.advance();
 
-		return res.success(new SwitchNode(switchTok, caseNodes, defaultNode));
+		return res.success(new SwitchNode(switchNode, caseNodes, defaultNode));
 	}
 
 	caseExpr() {
@@ -1086,6 +1096,11 @@ class Parser {
 		return res.success([cases, elseCase]);
 	}
 
+	/**
+	 * The conversion of tokens in a If Node.
+	 * @param {string} caseKeyword
+	 * @returns {ParseResult}
+	 */
 	ifExprCases(caseKeyword) {
 		let res = new ParseResult();
 		let cases = [];
@@ -1410,10 +1425,18 @@ class Parser {
 		return res.success(node);
 	}
 
+	/**
+	 * To effectuate an operation between two expressions.
+	 * @param {string} funca
+	 * @param {string[]} ops
+	 * @param {string} funcb
+	 * @returns {ParseResult}
+	 */
 	binOp(funca, ops, funcb = null) {
 		if (funcb === null) {
 			funcb = funca;
 		}
+
 		let res = new ParseResult();
 		let left = res.register(this[funca]());
 		if (res.error) return res;

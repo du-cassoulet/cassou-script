@@ -1,3 +1,5 @@
+import BaseNode from "./Nodes/BaseNode.js";
+
 class ParseResult {
 	constructor() {
 		this.error = null;
@@ -12,20 +14,33 @@ class ParseResult {
 		++this.advanceCount;
 	}
 
+	/**
+	 * To register the parsed result into the advencement.
+	 * @param {ParseResult} res
+	 * @returns {BaseNode}
+	 */
 	register(res) {
 		this.lastRegisteredAdvanceCount = res.advanceCount;
 		this.advanceCount += res.advanceCount;
+
 		if (res.error) {
 			this.error = res.error;
 		}
+
 		return res.node;
 	}
 
+	/**
+	 * To register the parsed result into the advencement if there is no error.
+	 * @param {ParseResult} res
+	 * @returns {BaseNode}
+	 */
 	tryRegister(res) {
 		if (res.error) {
 			this.toReverseCount = res.advanceCount;
 			return null;
 		}
+
 		return this.register(res);
 	}
 

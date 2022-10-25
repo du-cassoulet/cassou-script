@@ -1,4 +1,13 @@
+import Position from "./Position.js";
+
 class Token {
+	/**
+	 * A token and it's value and type.
+	 * @param {string} _type
+	 * @param {string} value
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 */
 	constructor(_type, value = null, posStart = null, posEnd = null) {
 		this.type = _type;
 		this.value = value;
@@ -14,6 +23,12 @@ class Token {
 		}
 	}
 
+	/**
+	 * To see if a value matches with it's type.
+	 * @param {string} _type
+	 * @param {string} value
+	 * @returns {boolean}
+	 */
 	matches(_type, value) {
 		return this.type === _type && this.value === value;
 	}

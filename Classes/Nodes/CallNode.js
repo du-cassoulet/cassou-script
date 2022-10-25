@@ -1,5 +1,13 @@
-class CallNode {
+import BaseNode from "./BaseNode.js";
+
+class CallNode extends BaseNode {
+	/**
+	 * @param {BaseNode} nodeToCall
+	 * @param {BaseNode[]} argNodes
+	 */
 	constructor(nodeToCall, argNodes) {
+		super();
+
 		this.nodeToCall = nodeToCall;
 		this.argNodes = argNodes;
 

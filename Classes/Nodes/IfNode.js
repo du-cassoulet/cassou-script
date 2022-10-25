@@ -1,5 +1,13 @@
-class IfNode {
+import BaseNode from "./BaseNode.js";
+
+class IfNode extends BaseNode {
+	/**
+	 * @param {[BaseNode, BaseNode, boolean][]} cases
+	 * @param {[BaseNode, BaseNode, boolean]} elseCase
+	 */
 	constructor(cases, elseCase) {
+		super();
+
 		this.cases = cases;
 		this.elseCase = elseCase;
 

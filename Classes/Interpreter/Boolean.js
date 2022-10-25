@@ -1,11 +1,18 @@
 import Value from "./Value.js";
 
 class Boolean extends Value {
+	/**
+	 * @param {boolean} value
+	 */
 	constructor(value) {
 		super();
 		this.value = value;
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonEq(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -17,6 +24,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonNe(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -28,6 +39,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonLt(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -39,6 +54,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonGt(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -50,6 +69,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonLte(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -61,6 +84,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonGte(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -72,6 +99,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	andedBy(other) {
 		if (other instanceof Boolean) {
 			return [
@@ -83,6 +114,10 @@ class Boolean extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	oredBy(other) {
 		if (other instanceof Boolean) {
 			return [

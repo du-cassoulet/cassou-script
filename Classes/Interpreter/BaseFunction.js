@@ -5,6 +5,9 @@ import Value from "./Value.js";
 import Errors from "../Errors.js";
 
 class BaseFunction extends Value {
+	/**
+	 * @param {string} name
+	 */
 	constructor(name) {
 		super();
 		this.name = name || "anonymous";
@@ -16,8 +19,14 @@ class BaseFunction extends Value {
 		return newContext;
 	}
 
+	/**
+	 * @param {string[]} argNames
+	 * @param {Value[]} args
+	 * @returns {RTResult}
+	 */
 	checkArgs(argNames, args) {
 		let res = new RTResult();
+
 		if (args.length > argNames.length) {
 			return res.failure(
 				new Errors.RTError(
@@ -47,6 +56,11 @@ class BaseFunction extends Value {
 		return res.success(null);
 	}
 
+	/**
+	 * @param {string[]} argNames
+	 * @param {Vlaue[]} args
+	 * @param {Context} execCtx
+	 */
 	populateArgs(argNames, args, execCtx) {
 		for (const i in args) {
 			let argName = argNames[i];
@@ -56,6 +70,11 @@ class BaseFunction extends Value {
 		}
 	}
 
+	/**
+	 * @param {string[]} argNames
+	 * @param {Vlaue[]} args
+	 * @param {Context} execCtx
+	 */
 	checkAndPopulateArgs(argNames, args, execCtx) {
 		let res = new RTResult();
 		res.register(this.checkArgs(argNames, args));

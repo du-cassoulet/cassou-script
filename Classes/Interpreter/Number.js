@@ -7,11 +7,18 @@ import String from "./String.js";
 class Number extends Value {
 	static pi = new Number(Math.PI);
 
+	/**
+	 * @param {number} value
+	 */
 	constructor(value) {
 		super();
 		this.value = value;
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	addedTo(other) {
 		if (other instanceof Number) {
 			return [
@@ -29,6 +36,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	subbedBy(other) {
 		if (other instanceof Number) {
 			return [
@@ -40,6 +51,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	multedBy(other) {
 		if (other instanceof Number) {
 			return [
@@ -51,6 +66,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	divedBy(other) {
 		if (other instanceof Number) {
 			if (other.value === 0) {
@@ -69,6 +88,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	powedBy(other) {
 		if (other instanceof Number) {
 			return [
@@ -80,6 +103,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	moduledBy(other) {
 		return [
 			new Number(this.value % other.value).setContext(this.context),
@@ -87,6 +114,10 @@ class Number extends Value {
 		];
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonEq(other) {
 		if (other instanceof Number) {
 			return [
@@ -98,6 +129,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonNe(other) {
 		if (other instanceof Number) {
 			return [
@@ -109,6 +144,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonLt(other) {
 		if (other instanceof Number) {
 			return [
@@ -120,6 +159,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonGt(other) {
 		if (other instanceof Number) {
 			return [
@@ -131,6 +174,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonLte(other) {
 		if (other instanceof Number) {
 			return [
@@ -142,6 +189,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	getComparisonGte(other) {
 		if (other instanceof Number) {
 			return [
@@ -153,6 +204,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	andedBy(other) {
 		if (other instanceof Number) {
 			return [
@@ -164,6 +219,10 @@ class Number extends Value {
 		}
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	oredBy(other) {
 		if (other instanceof Number) {
 			return [
@@ -179,6 +238,10 @@ class Number extends Value {
 		return [new Boolean(!this.value).setContext(this.context), null];
 	}
 
+	/**
+	 * @param {Value} other
+	 * @returns {[Value, Errors.BaseError]}
+	 */
 	isIn(other) {
 		if (other instanceof List) {
 			let includes = !!other.elements.find(

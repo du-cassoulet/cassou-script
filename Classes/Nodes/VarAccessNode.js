@@ -1,10 +1,20 @@
-class VarAccessNode {
-	constructor(varNameTok, varPathTok) {
+import Token from "../Token.js";
+import BaseNode from "./BaseNode.js";
+
+class VarAccessNode extends BaseNode {
+	/**
+	 *
+	 * @param {Token} varNameTok
+	 * @param {string[]} path
+	 */
+	constructor(varNameTok, path) {
+		super();
+
 		this.varNameTok = varNameTok;
-		this.varPathTok = varPathTok;
+		this.path = path;
 
 		this.posStart = this.varNameTok.posStart;
-		this.posEnd = this.varPathTok.posEnd;
+		this.posEnd = this.path.posEnd;
 	}
 }
 

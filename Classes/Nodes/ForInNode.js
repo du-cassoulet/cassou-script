@@ -1,4 +1,15 @@
-class ForInNode {
+import Token from "../Token.js";
+import BaseNode from "./BaseNode.js";
+
+class ForInNode extends BaseNode {
+	/**
+	 * @param {Token} varNameTok
+	 * @param {BaseNode} startValueNode
+	 * @param {BaseNode} endValueNode
+	 * @param {BaseNode} stepValueNode
+	 * @param {BaseNode} bodyNode
+	 * @param {boolean} shouldReturnNull
+	 */
 	constructor(
 		varNameTok,
 		startValueNode,
@@ -7,6 +18,8 @@ class ForInNode {
 		bodyNode,
 		shouldReturnNull
 	) {
+		super();
+
 		this.varNameTok = varNameTok;
 		this.startValueNode = startValueNode;
 		this.endValueNode = endValueNode;

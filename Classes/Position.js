@@ -1,4 +1,12 @@
 class Position {
+	/**
+	 * The position of the lexer or an element in the code.
+	 * @param {number} idx
+	 * @param {number} ln
+	 * @param {number} col
+	 * @param {string} fn
+	 * @param {string} ftxt
+	 */
 	constructor(idx, ln, col, fn, ftxt) {
 		this.idx = idx;
 		this.ln = ln;
@@ -7,6 +15,11 @@ class Position {
 		this.ftxt = ftxt;
 	}
 
+	/**
+	 * To make the position advance in the document.
+	 * @param {string | null} currentChar
+	 * @returns {Position}
+	 */
 	advance(currentChar = null) {
 		++this.idx;
 		++this.col;

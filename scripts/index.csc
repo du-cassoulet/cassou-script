@@ -12,7 +12,12 @@ set list = [
     "name": "Mayomat"
   }
 ]
+func compare(id) {
+  if list.0."_id" == id {
+    log("YOUHOU")
+  } else {
+    log("NOOO")
+  }
+}
 
-set [ cassoulet ] = list;
-
-log(cassoulet);
+compare(1);

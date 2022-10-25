@@ -1,5 +1,15 @@
-class ObjectNode {
+import Position from "../Position.js";
+import BaseNode from "./BaseNode.js";
+
+class ObjectNode extends BaseNode {
+	/**
+	 * @param {BaseNode[]} elementNodes
+	 * @param {Position} posStart
+	 * @param {Position} posEnd
+	 */
 	constructor(elementNodes, posStart, posEnd) {
+		super();
+
 		this.elementNodes = elementNodes;
 
 		this.posStart = posStart;
