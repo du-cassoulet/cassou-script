@@ -115,4 +115,5 @@ package-lock.json
 .replit
 replit.nix
 
+# Prettier
 .prettierignore
