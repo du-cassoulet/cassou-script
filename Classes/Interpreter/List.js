@@ -1,6 +1,7 @@
 import Errors from "../Errors.js";
 import Number from "./Number.js";
 import Value from "./Value.js";
+import Object from "./Object.js";
 
 class List extends Value {
 	constructor(elements) {
@@ -77,18 +78,34 @@ class List extends Value {
 
 		if (this.elements.length === 0) return "[]".gray;
 
-		return (
-			"[".gray +
-			"\n" +
-			this.elements
-				.map((e) => {
-					return "  " + tab + e.toString(tabNum + 2);
-				})
-				.join(",\n") +
-			"\n" +
-			tab +
-			"]".gray
-		);
+		if (
+			!this.elements.find((e) => e instanceof List || e instanceof Object) &&
+			this.elements.toString().length < 10
+		) {
+			return (
+				"[ ".gray +
+				this.elements
+					.map((e) => {
+						return tab + e.toString(tabNum + 2);
+					})
+					.join(", ") +
+				tab +
+				" ]".gray
+			);
+		} else {
+			return (
+				"[".gray +
+				"\n" +
+				this.elements
+					.map((e) => {
+						return "  " + tab + e.toString(tabNum + 2);
+					})
+					.join(",\n") +
+				"\n" +
+				tab +
+				"]".gray
+			);
+		}
 	}
 }
 

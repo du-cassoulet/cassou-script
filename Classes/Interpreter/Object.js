@@ -41,26 +41,51 @@ class Object extends Value {
 			return "{}".gray;
 		}
 
-		return (
-			"{".gray +
-			"\n" +
-			this.elements
-				.map((e) => {
-					return (
-						"  " +
-						tab +
-						"'".green +
-						e.elements[0].toString().green +
-						"'".green +
-						": ".gray +
-						e.elements[1].toString(tabNum + 2)
-					);
-				})
-				.join(",\n") +
-			"\n" +
-			tab +
-			"}".gray
-		);
+		if (
+			!this.elements.find(
+				(e) => e.elements[1] instanceof List || e.elements[1] instanceof Object
+			) &&
+			this.elements.toString().length < 200
+		) {
+			return (
+				"{ ".gray +
+				this.elements
+					.map((e) => {
+						return (
+							tab +
+							"'".green +
+							e.elements[0].toString().green +
+							"'".green +
+							": ".gray +
+							e.elements[1].toString(tabNum + 2)
+						);
+					})
+					.join(", ") +
+				tab +
+				" }".gray
+			);
+		} else {
+			return (
+				"{".gray +
+				"\n" +
+				this.elements
+					.map((e) => {
+						return (
+							"  " +
+							tab +
+							"'".green +
+							e.elements[0].toString().green +
+							"'".green +
+							": ".gray +
+							e.elements[1].toString(tabNum + 2)
+						);
+					})
+					.join(",\n") +
+				"\n" +
+				tab +
+				"}".gray
+			);
+		}
 	}
 }
 
